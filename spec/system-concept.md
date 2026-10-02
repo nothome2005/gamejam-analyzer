@@ -16,3 +16,10 @@
 - Submission (Проєкт): надіслана гра.
   - Дані перевірки розробки: URL на репозиторій сирцевого коду та контрольна сума релізу (SHA-256), оцінка оригінальності контенту.
   - Дані дистрибуції: зовнішнє посилання на гру (Itch.io / GameJolt / WebGL), обмеження розміру білда (до 500 МБ) та перелік сторонніх асетів.
+
+## 4. Нормативна специфікація та статус
+Базовий концепт деталізовано та затверджено в межах контрольної точки **SPEC-GATE** (2026-10-02):
+- Повна специфікація вимог (SRS v1.0): [spec/srs.md](file:///g:/KPI/4%20%D0%BA%D1%83%D1%80%D1%81/%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%83%D0%B2%D0%B0%D0%BD%D0%BD%D1%8F%20%D0%86%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D1%96%D0%B9%D0%BD%D0%B8%D1%85%20%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC/gamejam-analyzer/spec/srs.md) (та [spec/srs.tex](file:///g:/KPI/4%20%D0%BA%D1%83%D1%80%D1%81/%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%83%D0%B2%D0%B0%D0%BD%D0%BD%D1%8F%20%D0%86%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D1%96%D0%B9%D0%BD%D0%B8%D1%85%20%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC/gamejam-analyzer/spec/srs.tex)).
+- Матриця простежуваності: [spec/traceability-matrix.md](file:///g:/KPI/4%20%D0%BA%D1%83%D1%80%D1%81/%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%83%D0%B2%D0%B0%D0%BD%D0%BD%D1%8F%20%D0%86%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D1%96%D0%B9%D0%BD%D0%B8%D1%85%20%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC/gamejam-analyzer/spec/traceability-matrix.md).
+- Протокол узгодження SKED: [logs/sked-summary.md](file:///g:/KPI/4%20%D0%BA%D1%83%D1%80%D1%81/%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%83%D0%B2%D0%B0%D0%BD%D0%BD%D1%8F%20%D0%86%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D1%96%D0%B9%D0%BD%D0%B8%D1%85%20%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC/gamejam-analyzer/logs/sked-summary.md).
+- Протокол SPEC-GATE: [logs/spec-gate.md](file:///g:/KPI/4%20%D0%BA%D1%83%D1%80%D1%81/%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D1%83%D0%B2%D0%B0%D0%BD%D0%BD%D1%8F%20%D0%86%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D1%96%D0%B9%D0%BD%D0%B8%D1%85%20%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC/gamejam-analyzer/logs/spec-gate.md).

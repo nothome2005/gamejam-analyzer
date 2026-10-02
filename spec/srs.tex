@@ -1,0 +1,107 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[ukrainian]{babel}
+\usepackage{geometry}
+\geometry{left=2.5cm,right=1.5cm,top=2cm,bottom=2cm}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{listings}
+\usepackage{color}
+
+\title{\textbf{Специфікація вимог до програмного забезпечення (SRS)}\\
+\large Інформаційна система обліку та аналізу ігрових джемів (Game Jam Analyzer)\\\small Версія 1.0 (Baseline) --- Контрольна точка SPEC-GATE}
+\author{Маслов Андрій Ігорович (гр. КН-31) \and Antigravity AI Agent}
+\date{2026-10-02}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Вступ (Introduction)}
+\subsection{Призначення документа}
+Цей документ містить формальну специфікацію вимог до інформаційної системи \textbf{Game Jam Analyzer}. Документ розроблено на основі рекомендацій стандарту IEEE 830 та сучасної методології Specification-Driven Development (SDD). Документ виступає базовим верифікованим еталоном для проектування архітектури, створення компонентів, автотестів та подальшого розвитку системи.
+
+\subsection{Межі системи (Scope)}
+\subsubsection{Входить до системи (In-Scope, v1.0)}
+\begin{enumerate}
+    \item \textbf{Конфігурація джемів}: створення подій, налаштування тем, часових меж (початок, дедлайн, суддівство), регламенту штрафів за запізнення.
+    \item \textbf{Управління учасниками та командами}: реєстрація користувачів, облік спеціалізацій (Gameplay Programmer, 2D/3D Artist, Sound Designer), об'єднання у команди.
+    \item \textbf{Реєстрація та аудит робіт (Submissions)}:
+    \begin{itemize}
+        \item Фіксація посилань на Git-репозиторії (GitHub, GitLab).
+        \item Контрольна сума SHA-256 та commit hash релізу для перевірки незмінності коду після дедлайну.
+        \item Декларація сторонніх асетів (Asset Inventory) для оцінки оригінальності.
+        \item Облік зовнішніх WebGL-білдів (Itch.io, GameJolt) та валідація розміру до 500 МБ.
+    \end{itemize}
+    \item \textbf{Підтримка м'якого дедлайну (Soft Deadline)}: автоматичне маркування робіт із фіксацією \texttt{is\_late: true}, реєстрацією хвилин затримки та штрафних балів.
+    \item \textbf{Життєвий цикл статусів}: \texttt{Draft} $\rightarrow$ \texttt{Submitted} $\rightarrow$ \texttt{Under Review} $\rightarrow$ \texttt{Completed}.
+    \item \textbf{Суддівська оцінка}: мультикритеріальна 5-бальна оцінка за 5 вимірами (Gameplay, Theme, Graphics, Audio, Code Quality).
+    \item \textbf{Аналітика та лідерборд}: зважений розрахунок рейтингу, статистика популярності ігрових рушіїв (Godot, Unity, Unreal, Custom).
+\end{enumerate}
+
+\subsubsection{Не входить до системи (Out-of-Scope, v1.0)}
+\begin{enumerate}
+    \item Власний важкий файловий хостинг білдів понад 500 МБ на серверах платформи.
+    \item Вбудований хмарний 3D WebGL-раннер на бекенді.
+    \item Фінансові транзакції та платіжні шлюзи для грошових призів.
+    \item Комунікаційні чати реального часу між учасниками (використовуються Discord/Telegram).
+\end{enumerate}
+
+\section{Глосарій предметної області (Domain Glossary)}
+\begin{table}[h!]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Термін} & \textbf{Англ. еквівалент} & \textbf{Визначення} \\ \hline
+Джем & Game Jam & Тематичний хакатон із розробки відеоігор з фіксованим дедлайном. \\ \hline
+Організатор & Organizer & Користувач із правами адміністрування джему та затвердження результатів. \\ \hline
+Капітан команди & Team Captain & Учасник, уповноважений подавати та редагувати картку проєкту. \\ \hline
+Сабмішн & Submission & Подана на конкурс робота (код, білд, метадані, асети). \\ \hline
+Хеш SHA-256 & SHA-256 Checksum & 64-символьний шістнадцятковий криптографічний хеш релізу. \\ \hline
+М'який дедлайн & Soft Deadline & Режим прийому робіт із нарахуванням штрафних балів за запізнення. \\ \hline
+Закрите суддівство & Under Review & Етап, коли доступ до робіт та оцінок мають виключно судді й оргкомітет. \\ \hline
+Лідерборд & Leaderboard & Таблиця результатів джему зі зваженими балами та штрафами. \\ \hline
+\end{tabularx}
+\caption{Глосарій термінів предметної області}
+\end{table}
+
+\section{Функціональні вимоги (Functional Requirements)}
+\begin{itemize}
+    \item \textbf{REQ-F-001 (Конфігурація джему)}: Організатор налаштовує параметри події (дати, тему, штрафи). \textit{AC-F-001}: Валідація часових рамок та збереження в БД.
+    \item \textbf{REQ-F-002 (Команди та ролі)}: Реєстрація команд із прив'язкою спеціалізацій учасників. \textit{AC-F-002}: Унікальність членства учасника в команді джему.
+    \item \textbf{REQ-F-003 (Аудиторські дані сабмішну)}: Подання Git URL, commit hash, SHA-256 та Asset Inventory. \textit{AC-F-003}: Перевірка регулярного виразу SHA-256 (\texttt{\^{}[a-fA-F0-9]\{64\}\$}).
+    \item \textbf{REQ-F-004 (Дистрибуція та ліміт розміру)}: Зовнішні URL WebGL та ліміт до 500 МБ. \textit{AC-F-004}: Блокуюче попередження при перевищенні ваги.
+    \item \textbf{REQ-F-005 (Облік м'якого дедлайну)}: Реєстрація робіт після дедлайну з позначкою \texttt{is\_late: true}. \textit{AC-F-005}: Автоматичний розрахунок штрафу.
+    \item \textbf{REQ-F-006 (Життєвий цикл та захист суддівства)}: Статусна модель з обмеженням видимості на етапі \texttt{Under Review}. \textit{AC-F-006}: Помилка 403 при неавторизованому доступі.
+    \item \textbf{REQ-F-007 (Мультикритеріальне оцінювання)}: Оцінка журі за 5 категоріями (1--5). \textit{AC-F-007}: Заборона оцінювання власного проєкту та виходу за межі діапазону.
+    \item \textbf{REQ-F-008 (Генерація лідерборду)}: Розрахунок зваженого рейтингу з відніманням штрафів. \textit{AC-F-008}: Детерміноване ранжування команд.
+    \item \textbf{REQ-F-009 (Аналітика ігрових рушіїв)}: Агрегація частоти використання рушіїв (Godot, Unity тощо). \textit{AC-F-009}: Генерація JSON-звіту розподілу.
+    \item \textbf{REQ-F-010 (Публічний каталог робіт)}: Загальнодоступна галерея завершених ігор. \textit{AC-F-010}: Пагінація та фільтрація робіт.
+\end{itemize}
+
+\section{Нефункціональні вимоги (Non-Functional Requirements)}
+\begin{itemize}
+    \item \textbf{REQ-NF-001 (Продуктивність)}: Формування лідерборду до 500 робіт за час $t \le 1.5$ с (p95).
+    \item \textbf{REQ-NF-002 (Безпека та ізоляція)}: Захист оцінок журі до публікації результатів через RBAC.
+    \item \textbf{REQ-NF-003 (Аудит та незмінність)}: Незмінний журнал історії змін сабмішну.
+    \item \textbf{REQ-NF-004 (Стійкість до збоїв)}: Автозбереження чернеток форм у клієнті та на сервері.
+    \item \textbf{REQ-NF-005 (Доступність)}: Відповідність інтерфейсу стандарту WCAG 2.1 AA (Lighthouse $\ge 90$).
+    \item \textbf{REQ-NF-006 (Супровідність)}: Модульна архітектура з адаптерами Git-хостингів.
+\end{itemize}
+
+\section{BDD-сценарії (Specification by Example)}
+\begin{verbatim}
+Scenario: Подання проєкту із запізненням (М'який дедлайн)
+  Given джем "Winter Indie Jam 2026" має дедлайн 2026-10-02 20:00 UTC
+  And поточний серверний час становить 2026-10-02 20:45 UTC
+  When капітан команди "RetroSquad" надсилає проєкт "Neon Dash"
+  Then система приймає проєкт зі статусом "Submitted"
+  And прапорець "is_late" встановлюється у "true"
+  And система фіксує тривалість запізнення "late_minutes = 45"
+  And нараховуються штрафні бали згідно з регламентом
+\end{verbatim}
+
+\end{document}

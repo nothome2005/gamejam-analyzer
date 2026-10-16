@@ -1,35 +1,36 @@
-# Початкова матриця простежуваності вимог (Requirements Traceability Matrix - RTM)
+# Оновлена матриця простежуваності вимог (Requirements Traceability Matrix - RTM)
 
 - **Проєкт**: Інформаційна система обліку та аналізу ігрових джемів (Game Jam Analyzer)
-- **Версія матриці**: 1.0 (Етап SPEC-GATE)
-- **Дата створення**: 2026-10-02
-- **Покриття**: 100% функціональних (REQ-F) та нефункціональних (REQ-NF) вимог зв'язані з відповідними критеріями прийняття та сценаріями тестування.
+- **Версія матриці**: 2.0 (Етап PLAN-GATE)
+- **Дата оновлення**: 2026-10-16
+- **Статус**: Синхронізовано з декомпозицією завдань та календарним планом реалізації (Лабораторна робота №3).
 
 ---
 
-## Матриця взаємозв'язку вимог, критеріїв прийняття та BDD-сценаріїв
+## Матриця зв'язку вимог, критеріїв прийняття, BDD-сценаріїв та тікетів
 
-| ID вимоги | Тип | Зміст вимоги | Критерій прийняття (AC) | BDD Сценарій | Майбутній Ticket ID | Майбутній Test Case ID | Цільовий модуль коду | Розділ SRS |
+| ID вимоги | Тип | Зміст вимоги | Критерій прийняття (AC) | BDD Сценарій | Ідентифікатор тікета (Ticket ID) | Тестовий тікет (TDD/Test ID) | Цільовий модуль коду | Контрольна точка якості |
 |---|---|---|---|---|---|---|---|---|
-| **REQ-F-001** | FR | Створення та конфігурація джему | AC-F-001 | BDD-SC-001 | *[TICKET-JAM-01]* | *[TEST-JAM-01]* | `src/jams/` | Розділ 4.1 |
-| **REQ-F-002** | FR | Реєстрація команд і спеціалізацій | AC-F-002 | — | *[TICKET-TEAM-01]* | *[TEST-TEAM-01]* | `src/teams/` | Розділ 4.2 |
-| **REQ-F-003** | FR | Подання аудиторських даних (Git, SHA-256) | AC-F-003 | BDD-SC-001, BDD-SC-003 | *[TICKET-SUB-01]* | *[TEST-SUB-01]* | `src/submissions/` | Розділ 4.3 |
-| **REQ-F-004** | FR | Дистрибуція та ліміт ваги білда 500 МБ | AC-F-004 | BDD-SC-006 | *[TICKET-DIST-01]* | *[TEST-DIST-01]* | `src/distribution/` | Розділ 4.4 |
-| **REQ-F-005** | FR | Облік м'якого дедлайну (is_late, штрафи) | AC-F-005 | BDD-SC-002 | *[TICKET-TIME-01]* | *[TEST-TIME-01]* | `src/submissions/` | Розділ 4.5 |
-| **REQ-F-006** | FR | Захист етапу Under Review (RBAC) | AC-F-006 | BDD-SC-004 | *[TICKET-AUTH-01]* | *[TEST-AUTH-01]* | `src/auth/` | Розділ 4.6 |
-| **REQ-F-007** | FR | Мультикритеріальне оцінювання журі (1-5) | AC-F-007 | BDD-SC-005 | *[TICKET-REV-01]* | *[TEST-REV-01]* | `src/evaluations/` | Розділ 4.7 |
-| **REQ-F-008** | FR | Автоматичний розрахунок лідерборду | AC-F-008 | BDD-SC-005 | *[TICKET-LEAD-01]* | *[TEST-LEAD-01]* | `src/analytics/` | Розділ 4.8 |
-| **REQ-F-009** | FR | Аналітичний облік ігрових рушіїв | AC-F-009 | — | *[TICKET-ENG-01]* | *[TEST-ENG-01]* | `src/analytics/` | Розділ 4.9 |
-| **REQ-F-010** | FR | Публічний каталог ігор завершених джемів | AC-F-010 | — | *[TICKET-CAT-01]* | *[TEST-CAT-01]* | `src/catalog/` | Розділ 4.10 |
-| **REQ-NF-001**| NFR | Продуктивність лідерборду ($t \le 1.5$ с) | AC-NF-001 | — | *[TICKET-PERF-01]* | *[TEST-PERF-01]* | `src/analytics/` | Розділ 5.1 |
-| **REQ-NF-002**| NFR | Ізоляція оцінок до публікації | AC-NF-002 | BDD-SC-004 | *[TICKET-SEC-01]* | *[TEST-SEC-01]* | `src/auth/` | Розділ 5.2 |
-| **REQ-NF-003**| NFR | Незмінний журнал аудиту змін сабмішну | AC-NF-003 | — | *[TICKET-AUDIT-01]*| *[TEST-AUDIT-01]*| `src/audit/` | Розділ 5.3 |
-| **REQ-NF-004**| NFR | Надійність збереження чернеток форм | AC-NF-004 | — | *[TICKET-UI-01]* | *[TEST-UI-01]* | `src/client/` | Розділ 5.4 |
-| **REQ-NF-005**| NFR | Доступність інтерфейсу (WCAG 2.1 AA) | AC-NF-005 | — | *[TICKET-UI-02]* | *[TEST-UI-02]* | `src/client/` | Розділ 5.5 |
-| **REQ-NF-006**| NFR | Архітектурна супровідність (адаптери Git) | AC-NF-006 | — | *[TICKET-ARCH-01]*| *[TEST-ARCH-01]*| `src/adapters/` | Розділ 5.6 |
+| **REQ-F-001** | FR | Створення та конфігурація джему | AC-F-001 | BDD-SC-001 | `TICK-FEAT-JAM-01` | `TICK-TEST-JAM-01` | `src/jams/` | PLAN-GATE |
+| **REQ-F-002** | FR | Реєстрація команд і спеціалізацій | AC-F-002 | — | `TICK-FEAT-TEAM-01` | `TICK-TEST-TEAM-01` | `src/teams/` | PLAN-GATE |
+| **REQ-F-003** | FR | Аудит сабмішну (Git URL, SHA-256) | AC-F-003 | BDD-SC-001, 003 | `TICK-FEAT-SUB-01`, `TICK-FEAT-HASH-01` | `TICK-TEST-SUB-01`, `TICK-TEST-HASH-01` | `src/submissions/` | CORE-GATE *(High Cost)* |
+| **REQ-F-004** | FR | Дистрибуція та ліміт білда 500 МБ | AC-F-004 | BDD-SC-006 | `TICK-FEAT-DIST-01` | `TICK-TEST-DIST-01` | `src/distribution/` | CORE-GATE |
+| **REQ-F-005** | FR | Облік Soft Deadline (is_late, штрафи) | AC-F-005 | BDD-SC-002 | `TICK-FEAT-TIME-01` | `TICK-TEST-TIME-01` | `src/submissions/` | CORE-GATE *(High Cost)* |
+| **REQ-F-006** | FR | Захист етапу Under Review (RBAC) | AC-F-006 | BDD-SC-004 | `TICK-FEAT-AUTH-01` | `TICK-TEST-AUTH-01` | `src/auth/` | RELEASE-GATE *(High Cost)* |
+| **REQ-F-007** | FR | Мультикритеріальне оцінювання журі (1-5) | AC-F-007 | BDD-SC-005 | `TICK-FEAT-REV-01` | `TICK-TEST-REV-01` | `src/evaluations/` | RELEASE-GATE |
+| **REQ-F-008** | FR | Автоматичний розрахунок лідерборду | AC-F-008 | BDD-SC-005 | `TICK-FEAT-LEAD-01` | `TICK-TEST-LEAD-01` | `src/analytics/` | RELEASE-GATE |
+| **REQ-F-009** | FR | Аналітичний облік ігрових рушіїв | AC-F-009 | — | `TICK-FEAT-ENG-01` | `TICK-TEST-ENG-01` | `src/analytics/` | RELEASE-GATE |
+| **REQ-F-010** | FR | Публічний каталог завершених джемів | AC-F-010 | — | `TICK-FEAT-CAT-01` | — | `src/catalog/` | RELEASE-GATE |
+| **REQ-NF-001**| NFR | Продуктивність лідерборду ($t \le 1.5$ с) | AC-NF-001 | — | `TICK-FEAT-LEAD-01` | `TICK-TEST-LEAD-01` | `src/analytics/` | RELEASE-GATE |
+| **REQ-NF-002**| NFR | Ізоляція оцінок до завершення етапу | AC-NF-002 | BDD-SC-004 | `TICK-FEAT-AUTH-01` | `TICK-TEST-AUTH-01` | `src/auth/` | RELEASE-GATE *(High Cost)* |
+| **REQ-NF-003**| NFR | Незмінний журнал аудиту змін сабмішну | AC-NF-003 | — | `TICK-FEAT-AUDIT-01`| — | `src/audit/` | CORE-GATE |
+| **REQ-NF-004**| NFR | Надійність збереження чернеток форм | AC-NF-004 | — | `TICK-FEAT-UI-01` | — | `src/client/` | RELEASE-GATE |
+| **REQ-NF-005**| NFR | Доступність інтерфейсу (WCAG 2.1 AA) | AC-NF-005 | — | `TICK-FEAT-UI-01` | — | `src/client/` | RELEASE-GATE |
+| **REQ-NF-006**| NFR | Модульна архітектура адаптерів Git | AC-NF-006 | — | `TICK-FEAT-ARCH-01`| — | `src/adapters/` | CORE-GATE |
 
 ---
 
-## Примітки щодо подальшого використання матриці:
-1. Колонки `Майбутній Ticket ID`, `Майбутній Test Case ID` та `Цільовий модуль коду` зарезервовано для наступних фаз SDD-циклу (декомпозиція завдань, розробка тестів ATDD/TDD та реалізація програмного коду в `/src` та `/tests`).
-2. Будь-які зміни в переліку або формулюваннях вимог після фіксації контрольної точки SPEC-GATE повинні відображатися у формі офіційного адендуму до специфікації з синхронним оновленням цієї матриці.
+## Контрольні точки якості (Stage-Gates):
+1. **PLAN-GATE (`TICK-GATE-01`)**: Перевірка покриття SRS декомпозицією, блокування початку реалізації до затвердження плану.
+2. **CORE-GATE (`TICK-GATE-02`)**: Контроль якості та безпеки аудиту сабмішнів, валідатора SHA-256 та розрахунку штрафів м'якого дедлайну.
+3. **RELEASE-GATE (`TICK-GATE-03`)**: Фінальна валідація захисту закритого суддівства (RBAC), продуктивності лідерборду та UAT приймання продукту.

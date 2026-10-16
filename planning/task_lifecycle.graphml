@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:java="http://www.yworks.com/xml/yfiles-common/1.0/java" xmlns:sys="http://www.yworks.com/xml/yfiles-common/markup/primitives/2.0" xmlns:x="http://www.yworks.com/xml/yfiles-common/markup/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:y="http://www.yworks.com/xml/graphml" xmlns:yed="http://www.yworks.com/xml/yed/3" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://www.yworks.com/xml/schema/graphml/1.1/ygraphml.xsd">
+  <key for="node" id="d6" yfiles.type="nodegraphics"/>
+  <key for="edge" id="d10" yfiles.type="edgegraphics"/>
+  <key attr.name="description" attr.type="string" for="node" id="d5"/>
+  <key attr.name="description" attr.type="string" for="edge" id="d9"/>
+  <graph id="G" edgedefault="directed">
+    <node id="backlog">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="60.0" width="160.0" x="400.0" y="100.0"/>
+          <y:Fill color="#ECEFF1" transparent="false"/>
+          <y:BorderStyle color="#546E7A" type="line" width="1.5"/>
+          <y:NodeLabel alignment="center" fontFamily="Segoe UI" fontSize="12" fontStyle="plain" textColor="#263238" modelName="internal" modelPosition="c" autoSizePolicy="content">BACKLOG
+Черга вимог SRS</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="ready">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="60.0" width="160.0" x="400.0" y="250.0"/>
+          <y:Fill color="#E1F5FE" transparent="false"/>
+          <y:BorderStyle color="#0288D1" type="line" width="1.5"/>
+          <y:NodeLabel alignment="center" fontFamily="Segoe UI" fontSize="12" fontStyle="plain" textColor="#01579B" modelName="internal" modelPosition="c" autoSizePolicy="content">READY / TO DO
+Готова до спринту</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="progress">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="60.0" width="170.0" x="400.0" y="400.0"/>
+          <y:Fill color="#FFF8E1" transparent="false"/>
+          <y:BorderStyle color="#FFA000" type="line" width="1.5"/>
+          <y:NodeLabel alignment="center" fontFamily="Segoe UI" fontSize="12" fontStyle="plain" textColor="#E65100" modelName="internal" modelPosition="c" autoSizePolicy="content">IN PROGRESS
+Розробка коду/тесту</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="verif">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="60.0" width="170.0" x="400.0" y="550.0"/>
+          <y:Fill color="#E8F5E9" transparent="false"/>
+          <y:BorderStyle color="#2E7D32" type="line" width="1.5"/>
+          <y:NodeLabel alignment="center" fontFamily="Segoe UI" fontSize="12" fontStyle="plain" textColor="#1B5E20" modelName="internal" modelPosition="c" autoSizePolicy="content">VERIFICATION
+Автотести CI / Лінтинг</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="review">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="60.0" width="180.0" x="400.0" y="700.0"/>
+          <y:Fill color="#F3E5F5" transparent="false"/>
+          <y:BorderStyle color="#7B1FA2" type="line" width="1.5"/>
+          <y:NodeLabel alignment="center" fontFamily="Segoe UI" fontSize="12" fontStyle="plain" textColor="#4A148C" modelName="internal" modelPosition="c" autoSizePolicy="content">IN REVIEW / VALIDATION
+Код-рев'ю та UAT</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="gate">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="60.0" width="180.0" x="270.0" y="850.0"/>
+          <y:Fill color="#FFF8E1" transparent="false"/>
+          <y:BorderStyle color="#FFA000" type="line" width="1.5"/>
+          <y:NodeLabel alignment="center" fontFamily="Segoe UI" fontSize="12" fontStyle="plain" textColor="#E65100" modelName="internal" modelPosition="c" autoSizePolicy="content">STAGE-GATE PENDING
+Контрольна точка якості</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="done">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="60.0" width="170.0" x="400.0" y="1000.0"/>
+          <y:Fill color="#E8F5E9" transparent="false"/>
+          <y:BorderStyle color="#2E7D32" type="line" width="1.5"/>
+          <y:NodeLabel alignment="center" fontFamily="Segoe UI" fontSize="12" fontStyle="plain" textColor="#1B5E20" modelName="internal" modelPosition="c" autoSizePolicy="content">DONE / CLOSED
+Успішно закрито в main</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="revise">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="60.0" width="180.0" x="530.0" y="850.0"/>
+          <y:Fill color="#FFEBEE" transparent="false"/>
+          <y:BorderStyle color="#C62828" type="line" width="1.5"/>
+          <y:NodeLabel alignment="center" fontFamily="Segoe UI" fontSize="12" fontStyle="plain" textColor="#B71C1C" modelName="internal" modelPosition="c" autoSizePolicy="content">BLOCKED / REVISE
+Прогалина в ТЗ / Addendum</y:NodeLabel>
+          <y:Shape type="roundrectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <edge id="e0" source="backlog" target="ready">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:LineStyle color="#455A64" type="line" width="1.5"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:EdgeLabel alignment="center" configuration="AutoFlippingLabel" distance="2.0" fontFamily="Segoe UI" fontSize="11" fontStyle="plain" textColor="#263238" modelName="six_pos" modelPosition="tail">Декомпозиція [Людина (Lead)]</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e1" source="ready" target="progress">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:LineStyle color="#455A64" type="line" width="1.5"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:EdgeLabel alignment="center" configuration="AutoFlippingLabel" distance="2.0" fontFamily="Segoe UI" fontSize="11" fontStyle="plain" textColor="#263238" modelName="six_pos" modelPosition="tail">Взяття задачі [Агент/Людина]</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e2" source="progress" target="verif">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:LineStyle color="#455A64" type="line" width="1.5"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:EdgeLabel alignment="center" configuration="AutoFlippingLabel" distance="2.0" fontFamily="Segoe UI" fontSize="11" fontStyle="plain" textColor="#263238" modelName="six_pos" modelPosition="tail">Створено PR [Агент/Людина]</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e3" source="verif" target="progress">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:LineStyle color="#455A64" type="dashed" width="1.5"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:EdgeLabel alignment="center" configuration="AutoFlippingLabel" distance="2.0" fontFamily="Segoe UI" fontSize="11" fontStyle="plain" textColor="#263238" modelName="six_pos" modelPosition="tail">Тести впали [CI]</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e4" source="verif" target="review">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:LineStyle color="#455A64" type="line" width="1.5"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:EdgeLabel alignment="center" configuration="AutoFlippingLabel" distance="2.0" fontFamily="Segoe UI" fontSize="11" fontStyle="plain" textColor="#263238" modelName="six_pos" modelPosition="tail">Всі тести зелені [CI]</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e5" source="review" target="gate">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:LineStyle color="#455A64" type="line" width="1.5"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:EdgeLabel alignment="center" configuration="AutoFlippingLabel" distance="2.0" fontFamily="Segoe UI" fontSize="11" fontStyle="plain" textColor="#263238" modelName="six_pos" modelPosition="tail">Рев'ю схвалено [Людина]</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e6" source="review" target="progress">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:LineStyle color="#455A64" type="dashed" width="1.5"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:EdgeLabel alignment="center" configuration="AutoFlippingLabel" distance="2.0" fontFamily="Segoe UI" fontSize="11" fontStyle="plain" textColor="#263238" modelName="six_pos" modelPosition="tail">Зауваження [Людина]</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e7" source="review" target="revise">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:LineStyle color="#455A64" type="line" width="1.5"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:EdgeLabel alignment="center" configuration="AutoFlippingLabel" distance="2.0" fontFamily="Segoe UI" fontSize="11" fontStyle="plain" textColor="#263238" modelName="six_pos" modelPosition="tail">Прогалина в ТЗ [Людина]</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e8" source="gate" target="done">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:LineStyle color="#455A64" type="line" width="1.5"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:EdgeLabel alignment="center" configuration="AutoFlippingLabel" distance="2.0" fontFamily="Segoe UI" fontSize="11" fontStyle="plain" textColor="#263238" modelName="six_pos" modelPosition="tail">Вердикт GO [Тільки Людина]</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e9" source="gate" target="revise">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:LineStyle color="#455A64" type="line" width="1.5"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:EdgeLabel alignment="center" configuration="AutoFlippingLabel" distance="2.0" fontFamily="Segoe UI" fontSize="11" fontStyle="plain" textColor="#263238" modelName="six_pos" modelPosition="tail">Вердикт REVISE [Тільки Людина]</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e10" source="revise" target="ready">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:LineStyle color="#455A64" type="dashed" width="1.5"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:EdgeLabel alignment="center" configuration="AutoFlippingLabel" distance="2.0" fontFamily="Segoe UI" fontSize="11" fontStyle="plain" textColor="#263238" modelName="six_pos" modelPosition="tail">Addendum схвалено [Людина]</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+  </graph>
+</graphml>

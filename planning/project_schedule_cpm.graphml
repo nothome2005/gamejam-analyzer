@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" 
+         xmlns:java="http://www.yworks.com/xml/yfiles-common/1.0/java" 
+         xmlns:sys="http://www.yworks.com/xml/yfiles-common/markup/primitives/2.0" 
+         xmlns:x="http://www.yworks.com/xml/yfiles-common/markup/2.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xmlns:y="http://www.yworks.com/xml/graphml" 
+         xmlns:yed="http://www.yworks.com/xml/yed/3" 
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://www.yworks.com/xml/schema/graphml/1.1/ygraphml.xsd">
+  <key for="node" id="d6" yfiles.type="nodegraphics"/>
+  <key for="edge" id="d10" yfiles.type="edgegraphics"/>
+  <key attr.name="description" attr.type="string" for="node" id="d5"/>
+  <key attr.name="description" attr.type="string" for="edge" id="d9"/>
+  <graph id="G" edgedefault="directed">
+
+    <!-- ФАЗА 0: СПЕЦИФІКАЦІЯ ТА GATE -->
+    <node id="group_phase0" yfiles.foldertype="group">
+      <data key="d6">
+        <y:ProxyAutoBoundsNode>
+          <y:Realizers active="0">
+            <y:GroupNode>
+              <y:Geometry height="260.0" width="320.0" x="50.0" y="50.0"/>
+              <y:Fill color="#F5F5F5" transparent="false"/>
+              <y:BorderStyle color="#9E9E9E" type="dashed" width="1.5"/>
+              <y:NodeLabel alignment="left" autoSizePolicy="node_width" backgroundColor="#E0E0E0" fontFamily="Segoe UI" fontSize="12" fontStyle="bold" textColor="#212121" modelName="internal" modelPosition="t">ФАЗА 0: Специфікація та PLAN-GATE (Дні 1–2)</y:NodeLabel>
+              <y:Shape type="roundrectangle"/>
+              <y:State closed="false"/>
+            </y:GroupNode>
+          </y:Realizers>
+        </y:ProxyAutoBoundsNode>
+      </data>
+      <graph id="group_phase0:">
+        <node id="TICK_GATE_01">
+          <data key="d6">
+            <y:ShapeNode>
+              <y:Geometry height="65.0" width="260.0" x="80.0" y="90.0"/>
+              <y:Fill color="#FFCDD2" transparent="false"/>
+              <y:BorderStyle color="#B71C1C" type="line" width="2.5"/>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Segoe UI" fontSize="11" fontStyle="bold" textColor="#B71C1C" modelName="internal" modelPosition="c">◆ TICK-GATE-01: PLAN-GATE&#10;&lt;html&gt;&lt;b&gt;Тривалість: 2 год | Slack = 0 (КРИТИЧНА)&lt;/b&gt;&lt;br/&gt;&lt;font color="#333"&gt;Роль: Тільки Людина&lt;/font&gt;&lt;/html&gt;</y:NodeLabel>
+              <y:Shape type="hexagon"/>
+            </y:ShapeNode>
+          </data>
+        </node>
+        <node id="TICK_SPEC_01">
+          <data key="d6">
+            <y:ShapeNode>
+              <y:Geometry height="65.0" width="260.0" x="80.0" y="190.0"/>
+              <y:Fill color="#FFEBEE" transparent="false"/>
+              <y:BorderStyle color="#D32F2F" type="line" width="2.0"/>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Segoe UI" fontSize="11" fontStyle="bold" textColor="#B71C1C" modelName="internal" modelPosition="c">TICK-SPEC-01: OpenAPI Специфікація&#10;&lt;html&gt;&lt;b&gt;Тривалість: 3 год | Slack = 0 (КРИТИЧНА)&lt;/b&gt;&lt;br/&gt;&lt;font color="#333"&gt;Роль: Спільна (Людина + Агент)&lt;/font&gt;&lt;/html&gt;</y:NodeLabel>
+              <y:Shape type="roundrectangle"/>
+            </y:ShapeNode>
+          </data>
+        </node>
+      </graph>
+    </node>
+
+    <!-- ФАЗА 1: ДЖЕМИ ТА КОМАНДИ -->
+    <node id="group_phase1" yfiles.foldertype="group">
+      <data key="d6">
+        <y:ProxyAutoBoundsNode>
+          <y:Realizers active="0">
+            <y:GroupNode>
+              <y:Geometry height="260.0" width="340.0" x="420.0" y="50.0"/>
+              <y:Fill color="#F5F5F5" transparent="false"/>
+              <y:BorderStyle color="#9E9E9E" type="dashed" width="1.5"/>
+              <y:NodeLabel alignment="left" autoSizePolicy="node_width" backgroundColor="#E0E0E0" fontFamily="Segoe UI" fontSize="12" fontStyle="bold" textColor="#212121" modelName="internal" modelPosition="t">ФАЗА 1: Джеми та Команди (Дні 3–4)</y:NodeLabel>
+              <y:Shape type="roundrectangle"/>
+              <y:State closed="false"/>
+            </y:GroupNode>
+          </y:Realizers>
+        </y:ProxyAutoBoundsNode>
+      </data>
+      <graph id="group_phase1:">
+        <node id="TICK_TEST_JAM_01">
+          <data key="d6">
+            <y:ShapeNode>
+              <y:Geometry height="55.0" width="300.0" x="440.0" y="90.0"/>
+              <y:Fill color="#FFEBEE" transparent="false"/>
+              <y:BorderStyle color="#D32F2F" type="line" width="2.0"/>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Segoe UI" fontSize="10.5" fontStyle="bold" textColor="#B71C1C" modelName="internal" modelPosition="c">TICK-TEST-JAM-01: Тести конфігурації джемів&#10;1 год | Slack = 0 [Критичний шлях]</y:NodeLabel>
+              <y:Shape type="roundrectangle"/>
+            </y:ShapeNode>
+          </data>
+        </node>
+        <node id="TICK_FEAT_JAM_01">
+          <data key="d6">
+            <y:ShapeNode>
+              <y:Geometry height="55.0" width="300.0" x="440.0" y="160.0"/>
+              <y:Fill color="#FFEBEE" transparent="false"/>
+              <y:BorderStyle color="#D32F2F" type="line" width="2.0"/>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Segoe UI" fontSize="10.5" fontStyle="bold" textColor="#B71C1C" modelName="internal" modelPosition="c">TICK-FEAT-JAM-01: Модуль джемів (src/jams)&#10;2 год | Slack = 0 [Критичний шлях]</y:NodeLabel>
+              <y:Shape type="roundrectangle"/>
+            </y:ShapeNode>
+          </data>
+        </node>
+        <node id="TICK_FEAT_TEAM_01">
+          <data key="d6">
+            <y:ShapeNode>
+              <y:Geometry height="55.0" width="300.0" x="440.0" y="230.0"/>
+              <y:Fill color="#E3F2FD" transparent="false"/>
+              <y:BorderStyle color="#1976D2" type="line" width="1.5"/>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Segoe UI" fontSize="10.5" fontStyle="plain" textColor="#0D47A1" modelName="internal" modelPosition="c">TICK-FEAT-TEAM-01: Модель команд та інвайтів&#10;2 год | Slack = 3 дні (Паралельна)</y:NodeLabel>
+              <y:Shape type="roundrectangle"/>
+            </y:ShapeNode>
+          </data>
+        </node>
+      </graph>
+    </node>
+
+    <!-- ФАЗА 2: АУДИТ САБМІШНІВ, SHA-256 ТА CORE-GATE -->
+    <node id="group_phase2" yfiles.foldertype="group">
+      <data key="d6">
+        <y:ProxyAutoBoundsNode>
+          <y:Realizers active="0">
+            <y:GroupNode>
+              <y:Geometry height="330.0" width="350.0" x="810.0" y="50.0"/>
+              <y:Fill color="#F5F5F5" transparent="false"/>
+              <y:BorderStyle color="#9E9E9E" type="dashed" width="1.5"/>
+              <y:NodeLabel alignment="left" autoSizePolicy="node_width" backgroundColor="#E0E0E0" fontFamily="Segoe UI" fontSize="12" fontStyle="bold" textColor="#212121" modelName="internal" modelPosition="t">ФАЗА 2: Сабмішн, SHA-256 та CORE-GATE (Дні 5–8)</y:NodeLabel>
+              <y:Shape type="roundrectangle"/>
+              <y:State closed="false"/>
+            </y:GroupNode>
+          </y:Realizers>
+        </y:ProxyAutoBoundsNode>
+      </data>
+      <graph id="group_phase2:">
+        <node id="TICK_FEAT_SUB_01">
+          <data key="d6">
+            <y:ShapeNode>
+              <y:Geometry height="55.0" width="310.0" x="830.0" y="90.0"/>
+              <y:Fill color="#FFEBEE" transparent="false"/>
+              <y:BorderStyle color="#D32F2F" type="line" width="2.0"/>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Segoe UI" fontSize="10.5" fontStyle="bold" textColor="#B71C1C" modelName="internal" modelPosition="c">TICK-FEAT-SUB-01: Модель та API сабмішну&#10;3 год | Slack = 0 [Критичний шлях]</y:NodeLabel>
+              <y:Shape type="roundrectangle"/>
+            </y:ShapeNode>
+          </data>
+        </node>
+        <node id="TICK_FEAT_HASH_01">
+          <data key="d6">
+            <y:ShapeNode>
+              <y:Geometry height="55.0" width="310.0" x="830.0" y="160.0"/>
+              <y:Fill color="#FFEBEE" transparent="false"/>
+              <y:BorderStyle color="#D32F2F" type="line" width="2.0"/>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Segoe UI" fontSize="10.5" fontStyle="bold" textColor="#B71C1C" modelName="internal" modelPosition="c">TICK-FEAT-HASH-01: Валідатор SHA-256&#10;1.5 год | Slack = 0 [Критичний шлях]</y:NodeLabel>
+              <y:Shape type="roundrectangle"/>
+            </y:ShapeNode>
+          </data>
+        </node>
+        <node id="TICK_FEAT_TIME_01">
+          <data key="d6">
+            <y:ShapeNode>
+              <y:Geometry height="55.0" width="310.0" x="830.0" y="230.0"/>
+              <y:Fill color="#FFEBEE" transparent="false"/>
+              <y:BorderStyle color="#D32F2F" type="line" width="2.0"/>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Segoe UI" fontSize="10.5" fontStyle="bold" textColor="#B71C1C" modelName="internal" modelPosition="c">TICK-FEAT-TIME-01: Штрафи Soft Deadline&#10;3 год | Slack = 0 [Критичний шлях]</y:NodeLabel>
+              <y:Shape type="roundrectangle"/>
+            </y:ShapeNode>
+          </data>
+        </node>
+        <node id="TICK_GATE_02">
+          <data key="d6">
+            <y:ShapeNode>
+              <y:Geometry height="55.0" width="310.0" x="830.0" y="300.0"/>
+              <y:Fill color="#FFCDD2" transparent="false"/>
+              <y:BorderStyle color="#B71C1C" type="line" width="2.5"/>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Segoe UI" fontSize="11" fontStyle="bold" textColor="#B71C1C" modelName="internal" modelPosition="c">◆ TICK-GATE-02: CORE-GATE (Контрольна точка)&#10;Slack = 0 [Тільки Людина]</y:NodeLabel>
+              <y:Shape type="hexagon"/>
+            </y:ShapeNode>
+          </data>
+        </node>
+      </graph>
+    </node>
+
+    <!-- ФАЗА 3: БЕЗПЕКА ТА СУДДІВСТВО -->
+    <node id="group_phase3" yfiles.foldertype="group">
+      <data key="d6">
+        <y:ProxyAutoBoundsNode>
+          <y:Realizers active="0">
+            <y:GroupNode>
+              <y:Geometry height="260.0" width="330.0" x="1210.0" y="50.0"/>
+              <y:Fill color="#F5F5F5" transparent="false"/>
+              <y:BorderStyle color="#9E9E9E" type="dashed" width="1.5"/>
+              <y:NodeLabel alignment="left" autoSizePolicy="node_width" backgroundColor="#E0E0E0" fontFamily="Segoe UI" fontSize="12" fontStyle="bold" textColor="#212121" modelName="internal" modelPosition="t">ФАЗА 3: Безпека та Суддівство (Дні 9–11)</y:NodeLabel>
+              <y:Shape type="roundrectangle"/>
+              <y:State closed="false"/>
+            </y:GroupNode>
+          </y:Realizers>
+        </y:ProxyAutoBoundsNode>
+      </data>
+      <graph id="group_phase3:">
+        <node id="TICK_FEAT_AUTH_01">
+          <data key="d6">
+            <y:ShapeNode>
+              <y:Geometry height="55.0" width="290.0" x="1230.0" y="90.0"/>
+              <y:Fill color="#FFEBEE" transparent="false"/>
+              <y:BorderStyle color="#D32F2F" type="line" width="2.0"/>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Segoe UI" fontSize="10.5" fontStyle="bold" textColor="#B71C1C" modelName="internal" modelPosition="c">TICK-FEAT-AUTH-01: Модуль RBAC (Under Review)&#10;3 год | Slack = 0 [Критичний шлях]</y:NodeLabel>
+              <y:Shape type="roundrectangle"/>
+            </y:ShapeNode>
+          </data>
+        </node>
+        <node id="TICK_FEAT_REV_01">
+          <data key="d6">
+            <y:ShapeNode>
+              <y:Geometry height="55.0" width="290.0" x="1230.0" y="160.0"/>
+              <y:Fill color="#FFEBEE" transparent="false"/>
+              <y:BorderStyle color="#D32F2F" type="line" width="2.0"/>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Segoe UI" fontSize="10.5" fontStyle="bold" textColor="#B71C1C" modelName="internal" modelPosition="c">TICK-FEAT-REV-01: Модуль суддівства (1–5)&#10;3 год | Slack = 0 [Критичний шлях]</y:NodeLabel>
+              <y:Shape type="roundrectangle"/>
+            </y:ShapeNode>
+          </data>
+        </node>
+        <node id="TICK_FEAT_ARCH_01">
+          <data key="d6">
+            <y:ShapeNode>
+              <y:Geometry height="55.0" width="290.0" x="1230.0" y="230.0"/>
+              <y:Fill color="#E3F2FD" transparent="false"/>
+              <y:BorderStyle color="#1976D2" type="line" width="1.5"/>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Segoe UI" fontSize="10.5" fontStyle="plain" textColor="#0D47A1" modelName="internal" modelPosition="c">TICK-FEAT-ARCH-01: Адаптери Git-хостингів&#10;2.5 год | Slack = 4 дні (Паралельна)</y:NodeLabel>
+              <y:Shape type="roundrectangle"/>
+            </y:ShapeNode>
+          </data>
+        </node>
+      </graph>
+    </node>
+
+    <!-- ФАЗА 4: ЛІДЕРБОРД, АНАЛІТИКА ТА РЕЛІЗ -->
+    <node id="group_phase4" yfiles.foldertype="group">
+      <data key="d6">
+        <y:ProxyAutoBoundsNode>
+          <y:Realizers active="0">
+            <y:GroupNode>
+              <y:Geometry height="330.0" width="340.0" x="1590.0" y="50.0"/>
+              <y:Fill color="#F5F5F5" transparent="false"/>
+              <y:BorderStyle color="#9E9E9E" type="dashed" width="1.5"/>
+              <y:NodeLabel alignment="left" autoSizePolicy="node_width" backgroundColor="#E0E0E0" fontFamily="Segoe UI" fontSize="12" fontStyle="bold" textColor="#212121" modelName="internal" modelPosition="t">ФАЗА 4: Лідерборд та Реліз (Дні 12–15)</y:NodeLabel>
+              <y:Shape type="roundrectangle"/>
+              <y:State closed="false"/>
+            </y:GroupNode>
+          </y:Realizers>
+        </y:ProxyAutoBoundsNode>
+      </data>
+      <graph id="group_phase4:">
+        <node id="TICK_FEAT_LEAD_01">
+          <data key="d6">
+            <y:ShapeNode>
+              <y:Geometry height="55.0" width="300.0" x="1610.0" y="90.0"/>
+              <y:Fill color="#FFEBEE" transparent="false"/>
+              <y:BorderStyle color="#D32F2F" type="line" width="2.0"/>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Segoe UI" fontSize="10.5" fontStyle="bold" textColor="#B71C1C" modelName="internal" modelPosition="c">TICK-FEAT-LEAD-01: Рейтинг та Лідерборд&#10;3 год | Slack = 0 [Критичний шлях]</y:NodeLabel>
+              <y:Shape type="roundrectangle"/>
+            </y:ShapeNode>
+          </data>
+        </node>
+        <node id="TICK_VERIF_ALL_01">
+          <data key="d6">
+            <y:ShapeNode>
+              <y:Geometry height="55.0" width="300.0" x="1610.0" y="160.0"/>
+              <y:Fill color="#FFEBEE" transparent="false"/>
+              <y:BorderStyle color="#D32F2F" type="line" width="2.0"/>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Segoe UI" fontSize="10.5" fontStyle="bold" textColor="#B71C1C" modelName="internal" modelPosition="c">TICK-VERIF-ALL-01: Авторегресія CI&#10;1.5 год | Slack = 0 [Критичний шлях]</y:NodeLabel>
+              <y:Shape type="roundrectangle"/>
+            </y:ShapeNode>
+          </data>
+        </node>
+        <node id="TICK_VALID_ALL_01">
+          <data key="d6">
+            <y:ShapeNode>
+              <y:Geometry height="55.0" width="300.0" x="1610.0" y="230.0"/>
+              <y:Fill color="#FFEBEE" transparent="false"/>
+              <y:BorderStyle color="#D32F2F" type="line" width="2.0"/>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Segoe UI" fontSize="10.5" fontStyle="bold" textColor="#B71C1C" modelName="internal" modelPosition="c">TICK-VALID-ALL-01: Людська валідація UAT&#10;3 год | Slack = 0 [Критичний шлях]</y:NodeLabel>
+              <y:Shape type="roundrectangle"/>
+            </y:ShapeNode>
+          </data>
+        </node>
+        <node id="TICK_GATE_03">
+          <data key="d6">
+            <y:ShapeNode>
+              <y:Geometry height="55.0" width="300.0" x="1610.0" y="300.0"/>
+              <y:Fill color="#FFCDD2" transparent="false"/>
+              <y:BorderStyle color="#B71C1C" type="line" width="2.5"/>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Segoe UI" fontSize="11" fontStyle="bold" textColor="#B71C1C" modelName="internal" modelPosition="c">◆ TICK-GATE-03: RELEASE-GATE&#10;Фінальний реліз [Тільки Людина]</y:NodeLabel>
+              <y:Shape type="hexagon"/>
+            </y:ShapeNode>
+          </data>
+        </node>
+      </graph>
+    </node>
+
+    <!-- МІЖФАЗОВІ ЗВ'ЯЗКИ КРИТИЧНОГО ШЛЯХУ (BOLD RED EDGES) -->
+    <edge id="cp1" source="TICK_GATE_01" target="TICK_SPEC_01">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:LineStyle color="#D50000" type="line" width="3.0"/>
+          <y:Arrows source="none" target="standard"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="cp2" source="TICK_SPEC_01" target="TICK_TEST_JAM_01">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="130.0" sy="0.0" tx="-150.0" ty="0.0"/>
+          <y:LineStyle color="#D50000" type="line" width="3.0"/>
+          <y:Arrows source="none" target="standard"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="cp3" source="TICK_TEST_JAM_01" target="TICK_FEAT_JAM_01">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:LineStyle color="#D50000" type="line" width="3.0"/>
+          <y:Arrows source="none" target="standard"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="cp4" source="TICK_FEAT_JAM_01" target="TICK_FEAT_SUB_01">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="150.0" sy="0.0" tx="-155.0" ty="0.0"/>
+          <y:LineStyle color="#D50000" type="line" width="3.0"/>
+          <y:Arrows source="none" target="standard"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="cp5" source="TICK_FEAT_SUB_01" target="TICK_FEAT_HASH_01">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:LineStyle color="#D50000" type="line" width="3.0"/>
+          <y:Arrows source="none" target="standard"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="cp6" source="TICK_FEAT_HASH_01" target="TICK_FEAT_TIME_01">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:LineStyle color="#D50000" type="line" width="3.0"/>
+          <y:Arrows source="none" target="standard"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="cp7" source="TICK_FEAT_TIME_01" target="TICK_GATE_02">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:LineStyle color="#D50000" type="line" width="3.0"/>
+          <y:Arrows source="none" target="standard"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="cp8" source="TICK_GATE_02" target="TICK_FEAT_AUTH_01">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="155.0" sy="0.0" tx="-145.0" ty="0.0"/>
+          <y:LineStyle color="#D50000" type="line" width="3.0"/>
+          <y:Arrows source="none" target="standard"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="cp9" source="TICK_FEAT_AUTH_01" target="TICK_FEAT_REV_01">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:LineStyle color="#D50000" type="line" width="3.0"/>
+          <y:Arrows source="none" target="standard"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="cp10" source="TICK_FEAT_REV_01" target="TICK_FEAT_LEAD_01">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="145.0" sy="0.0" tx="-150.0" ty="0.0"/>
+          <y:LineStyle color="#D50000" type="line" width="3.0"/>
+          <y:Arrows source="none" target="standard"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="cp11" source="TICK_FEAT_LEAD_01" target="TICK_VERIF_ALL_01">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:LineStyle color="#D50000" type="line" width="3.0"/>
+          <y:Arrows source="none" target="standard"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="cp12" source="TICK_VERIF_ALL_01" target="TICK_VALID_ALL_01">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:LineStyle color="#D50000" type="line" width="3.0"/>
+          <y:Arrows source="none" target="standard"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="cp13" source="TICK_VALID_ALL_01" target="TICK_GATE_03">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:LineStyle color="#D50000" type="line" width="3.0"/>
+          <y:Arrows source="none" target="standard"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+
+  </graph>
+</graphml>

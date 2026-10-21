@@ -1,0 +1,384 @@
+name: "🌱 Seed SDD Issues & Milestones"
+
+on:
+  push:
+    paths:
+      - '.github/workflows/seed-sdd-tracker.yml'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  seed-tracker:
+    name: "Bootstrap GitHub Issues & Milestones from WBS"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Populate Milestones, Labels and Realistic WBS Issues
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          python - << 'EOF'
+          import os, json, urllib.request, urllib.error, urllib.parse, time
+
+          token = os.environ.get("GITHUB_TOKEN")
+          repo = os.environ.get("REPO")
+
+          headers = {
+              "Authorization": f"Bearer {token}",
+              "Accept": "application/vnd.github+json",
+              "X-GitHub-Api-Version": "2022-11-28",
+              "User-Agent": "SDDBootstrap"
+          }
+
+          def api_request(url, data=None, method="GET"):
+              body = json.dumps(data).encode("utf-8") if data else None
+              req = urllib.request.Request(url, data=body, headers=headers, method=method)
+              try:
+                  with urllib.request.urlopen(req) as resp:
+                      return json.loads(resp.read().decode("utf-8")) if resp.status != 204 else None
+              except urllib.error.HTTPError as e:
+                  err_msg = e.read().decode("utf-8")
+                  print(f"API Error [{e.code}] on {method} {url}: {err_msg}")
+                  return None
+
+          # 1. Sync Labels first
+          labels_file = ".github/labels.json"
+          if os.path.exists(labels_file):
+              with open(labels_file, "r", encoding="utf-8") as f:
+                  labels_data = json.load(f)
+              print(f"Ensuring {len(labels_data)} labels exist...")
+              labels_url = f"https://api.github.com/repos/{repo}/labels"
+              for lbl in labels_data:
+                  lbl_payload = {"name": lbl["name"], "color": lbl["color"], "description": lbl.get("description", "")}
+                  res = api_request(labels_url, lbl_payload, "POST")
+                  if res is None: # Likely already exists, patch
+                      encoded = urllib.parse.quote(lbl["name"])
+                      api_request(f"{labels_url}/{encoded}", lbl_payload, "PATCH")
+
+          # 2. Create Milestones
+          milestones_def = [
+              {"title": "Milestone 1: SPEC-GATE (Вимоги SRS v1.0)", "state": "closed", "desc": "Затвердження нормативної специфікації вимог IEEE 830 та BDD-сценаріїв"},
+              {"title": "Milestone 2: PLAN-GATE (Декомпозиція робіт та графік)", "state": "closed", "desc": "Затвердження WBS декомпозиції, мережевого графіку CPM та реєстру ризиків"},
+              {"title": "Milestone 3: CORE-GATE (Ядро подання робіт та аудит SHA-256)", "state": "open", "desc": "Реалізація моделі сабмішнів, валідатора SHA-256 та м'якого дедлайну"},
+              {"title": "Milestone 4: RELEASE-GATE (Суддівство, лідерборд, реліз)", "state": "open", "desc": "Фіналізація мультикритеріального оцінювання, лідерборду та каталогу робіт"}
+          ]
+
+          existing_milestones = api_request(f"https://api.github.com/repos/{repo}/milestones?state=all&per_page=100") or []
+          milestone_map = {m["title"]: m["number"] for m in existing_milestones}
+
+          for m in milestones_def:
+              if m["title"] not in milestone_map:
+                  print(f"Creating Milestone: {m['title']}")
+                  m_res = api_request(f"https://api.github.com/repos/{repo}/milestones", {
+                      "title": m["title"],
+                      "state": m["state"],
+                      "description": m["desc"]
+                  }, "POST")
+                  if m_res:
+                      milestone_map[m["title"]] = m_res["number"]
+                      time.sleep(0.5)
+
+          # 3. Create realistic SDD issues
+          issues_def = [
+              {
+                  "title": "[GATE] TICK-GATE-01: Затвердження плану декомпозиції робіт та реєстру ризиків (PLAN-GATE)",
+                  "milestone": "Milestone 2: PLAN-GATE (Декомпозиція робіт та графік)",
+                  "labels": ["type:gate", "status:done", "gate:plan-gate", "role:human-only", "priority:critical"],
+                  "state": "closed",
+                  "body": """### 🛑 Контрольна точка PLAN-GATE (Затверджено)
+
+**WBS Ticket ID**: `TICK-GATE-01`
+**Виконавець**: Студент (Lead Engineer / Human-Only)
+**Пов'язані артефакти**:
+- `planning/issue-tracker-workflow.md`
+- `planning/schedule-and-gantt.md`
+- `planning/risk-register.md`
+- `planning/project_schedule_cpm.graphml`
+
+#### ✅ Чекліст критеріїв PLAN-GATE:
+- [x] Повна WBS декомпозиція системи на 31 тікет (розділення Feature і Test за TDD).
+- [x] Розраховано критичний шлях (CPM): тривалість 25.5 годин, резерви часу виявлено.
+- [x] Побудовано діаграму Ганта та схему життєвого циклу завдань у yEd GraphML.
+- [x] Сформовано реєстр із 8 проєктних ризиків зі стратегіями пом'якшення.
+- [x] Підписано офіційний протокол `logs/plan-gate.md`.
+
+**Резолюція**: **GO (Схвалено людиною)**."""
+              },
+              {
+                  "title": "[ADDENDUM] ADD-001: Доповнення формату декларації сторонніх асетів у Asset Inventory",
+                  "milestone": "Milestone 2: PLAN-GATE (Декомпозиція робіт та графік)",
+                  "labels": ["type:addendum", "status:done", "role:human-only", "priority:medium"],
+                  "state": "closed",
+                  "body": """### 📜 SRS Addendum Protocol
+
+**ID Адендуму**: `ADD-001`
+**Зачеплені вимоги**: `REQ-F-003` (Подання аудиторських даних сабмішну)
+**Причина**: Необхідність явного розділення ліцензій на CC-BY та Royalty-Free аудіо-асети.
+
+#### Чекліст узгодження:
+- [x] Оновлено `spec/srs.md` та `spec/srs.tex`.
+- [x] Зміни узгоджено з матрицею простежуваності `spec/traceability-matrix.md`.
+- [x] Рішення затверджено людиною."""
+              },
+              {
+                  "title": "[BUG] Дефект валідації верхнього регістру у 64-символьному хеші SHA-256",
+                  "milestone": "Milestone 3: CORE-GATE (Ядро сабмішнів, SHA-256 та дедлайн)",
+                  "labels": ["type:bug", "status:done", "role:agent", "priority:high"],
+                  "state": "closed",
+                  "body": """### 🐛 Звіт про дефект
+
+**Порушена вимога**: `REQ-F-003` / `AC-F-003`
+**Опис**: Регулярний вираз на фронтенді спочатку підтримував тільки lowercase `^[a-f0-9]{64}$`, що призводило до помилкового відхилення хешів, згенерованих деякими утилітами у верхньому регістрі.
+
+**Виправлення**: Оновлено regex до `^[a-fA-F0-9]{64}$` та додано нормалізацію через `.lower()`."""
+              },
+              {
+                  "title": "[SPEC] TICK-SPEC-01: Формалізація OpenAPI/Swagger специфікації ендпоінтів Game Jam Analyzer",
+                  "milestone": "Milestone 3: CORE-GATE (Ядро сабмішнів, SHA-256 та дедлайн)",
+                  "labels": ["type:spec", "status:ready", "role:collaborative", "priority:high"],
+                  "state": "open",
+                  "body": """### 📋 Задача на формалізацію OpenAPI контракту
+
+**WBS Ticket ID**: `TICK-SPEC-01`
+**Зв'язані вимоги**: `REQ-F-001` .. `REQ-F-010`
+**Залежність**: Розблоковано після `TICK-GATE-01`
+**Цільовий артефакт**: `docs/openapi.yaml`
+
+#### Обсяг робіт:
+- [ ] Опис схеми `JamCreate`, `JamResponse` (REQ-F-001).
+- [ ] Опис схеми `SubmissionCreate`, `SubmissionResponse` з валідацією полів `git_url`, `commit_hash`, `sha256_checksum` (REQ-F-003, REQ-F-005).
+- [ ] Опис ендпоінтів оцінювання журі `POST /submissions/{id}/evaluations` (REQ-F-007).
+- [ ] Опис відповіді лідерборду `GET /jams/{id}/leaderboard` (REQ-F-008)."""
+              },
+              {
+                  "title": "[TEST] TICK-TEST-JAM-01: BDD/Unit тести валідації регламенту джему (AC-F-001)",
+                  "milestone": "Milestone 3: CORE-GATE (Ядро сабмішнів, SHA-256 та дедлайн)",
+                  "labels": ["type:test", "status:ready", "role:agent", "priority:high"],
+                  "state": "open",
+                  "body": """### 🧪 Розробка автотестів (TDD Red Phase)
+
+**WBS Ticket ID**: `TICK-TEST-JAM-01`
+**Зв'язана вимога**: `REQ-F-001` (Створення та конфігурація джему)
+**Критерій прийняття**: `AC-F-001` (Валідація дат start < deadline < review)
+**Блокує задачу**: `TICK-FEAT-JAM-01`
+
+#### Тестові кейси:
+- [ ] Позитивний тест створення джему з валідним часовим проміжком.
+- [ ] Негативний тест спроби задати `submission_deadline` раніше за `start_time` (HTTP 422).
+- [ ] Негативний тест спроби задати `review_deadline` раніше за дедлайн робіт."""
+              },
+              {
+                  "title": "[FEAT] TICK-FEAT-JAM-01: Модель та API створення і конфігурації джему (src/jams)",
+                  "milestone": "Milestone 3: CORE-GATE (Ядро сабмішнів, SHA-256 та дедлайн)",
+                  "labels": ["type:feature", "status:backlog", "role:agent", "priority:high"],
+                  "state": "open",
+                  "body": """### ✨ Реалізація виробничого коду
+
+**WBS Ticket ID**: `TICK-FEAT-JAM-01`
+**Зв'язана вимога**: `REQ-F-001`
+**Критерій прийняття**: `AC-F-001`
+**Заблоковано тестом**: `TICK-TEST-JAM-01`
+**Цільовий модуль**: `src/jams/`
+
+#### Завдання:
+- [ ] Створити Pydantic/SQLAlchemy схеми для сутності `Jam`.
+- [ ] Реалізувати роутер `POST /api/v1/jams`.
+- [ ] Прогнати тести до отримання статусу 100% Green."""
+              },
+              {
+                  "title": "[TEST] TICK-TEST-SUB-01: Тести аудиторських реквізитів гри: Git URL та Asset Inventory (AC-F-003)",
+                  "milestone": "Milestone 3: CORE-GATE (Ядро сабмішнів, SHA-256 та дедлайн)",
+                  "labels": ["type:test", "status:backlog", "role:agent", "priority:critical"],
+                  "state": "open",
+                  "body": """### 🧪 Автотести аудиту сабмішну
+
+**WBS Ticket ID**: `TICK-TEST-SUB-01`
+**Зв'язана вимога**: `REQ-F-003` (Подання аудиторських даних)
+**Критерій прийняття**: `AC-F-003`
+**BDD-сценарій**: `BDD-SC-001`
+**Блокує задачу**: `TICK-FEAT-SUB-01`
+
+#### Кейси:
+- [ ] Перевірка обов'язковості посилання на публічний Git-репозиторій.
+- [ ] Перевірка формату `commit_hash` (40 символів sha1 або 64 символи).
+- [ ] Перевірка структури списку сторонніх асетів (Asset Inventory)."""
+              },
+              {
+                  "title": "[TEST] TICK-TEST-HASH-01: Негативні та граничні BDD-тести перевірки SHA-256 хешу (BDD-SC-003)",
+                  "milestone": "Milestone 3: CORE-GATE (Ядро сабмішнів, SHA-256 та дедлайн)",
+                  "labels": ["type:test", "status:in-progress", "role:agent", "priority:critical"],
+                  "state": "open",
+                  "body": """### 🧪 Тести валідації криптографічного хешу
+
+**WBS Ticket ID**: `TICK-TEST-HASH-01`
+**Зв'язана вимога**: `REQ-F-003`
+**BDD-сценарій**: `BDD-SC-003` (Відхилення некоректного формату SHA-256)
+**Блокує задачу**: `TICK-FEAT-HASH-01`
+
+```gherkin
+Scenario: Спроба надіслати некоректний хеш SHA-256
+  Given капітан команди заповнює форму реєстрації проєкту
+  When у полі "sha256_checksum" введено значення "invalid-hash-too-short"
+  Then система відхиляє збереження з помилкою 422
+  And повертає повідомлення "Контрольна сума повинна містити рівно 64 шістнадцяткові символи"
+```"""
+              },
+              {
+                  "title": "[FEAT] TICK-FEAT-HASH-01: Криптографічний валідатор хешу SHA-256 (64 hex regex, src/submissions)",
+                  "milestone": "Milestone 3: CORE-GATE (Ядро сабмішнів, SHA-256 та дедлайн)",
+                  "labels": ["type:feature", "status:backlog", "role:agent", "priority:critical"],
+                  "state": "open",
+                  "body": """### ✨ Реалізація валідатора цілісності коду
+
+**WBS Ticket ID**: `TICK-FEAT-HASH-01`
+**Критичний шлях (CPM)**: Так (Critical Path)
+**Зв'язана вимога**: `REQ-F-003`
+**Критерій прийняття**: `AC-F-003`
+**Заблоковано тестом**: `TICK-TEST-HASH-01`
+**Цільовий модуль**: `src/submissions/validators.py`
+
+#### Завдання:
+- [ ] Реалізувати регулярний вираз `^[a-fA-F0-9]{64}$`.
+- [ ] Реалізувати асинхронний метод `verify_remote_archive_hash()`.
+- [ ] Забезпечити захист від ReDoS та ін'єкцій."""
+              },
+              {
+                  "title": "[TEST] TICK-TEST-TIME-01: BDD-тести обробки м'якого дедлайну: облік is_late та штрафів (BDD-SC-002)",
+                  "milestone": "Milestone 3: CORE-GATE (Ядро сабмішнів, SHA-256 та дедлайн)",
+                  "labels": ["type:test", "status:backlog", "role:agent", "priority:high"],
+                  "state": "open",
+                  "body": """### 🧪 Тести м'якого дедлайну (Human Override Logic)
+
+**WBS Ticket ID**: `TICK-TEST-TIME-01`
+**Зв'язана вимога**: `REQ-F-005` (Підтримка регламенту м'якого дедлайну)
+**Критерій прийняття**: `AC-F-005`
+**BDD-сценарій**: `BDD-SC-002`
+**Блокує задачу**: `TICK-FEAT-TIME-01`
+
+#### Кейси:
+- [ ] Подання гри за 5 хвилин до дедлайну -> `is_late=False`, штраф 0.
+- [ ] Подання гри через 45 хвилин після дедлайну -> `is_late=True`, `late_minutes=45`, нарахування штрафу.
+- [ ] Подання після `review_deadline` -> відхилення запиту."""
+              },
+              {
+                  "title": "[FEAT] TICK-FEAT-TIME-01: Модуль обліку м'якого дедлайну та нарахування штрафів (REQ-F-005)",
+                  "milestone": "Milestone 3: CORE-GATE (Ядро сабмішнів, SHA-256 та дедлайн)",
+                  "labels": ["type:feature", "status:backlog", "role:agent", "priority:high"],
+                  "state": "open",
+                  "body": """### ✨ Реалізація логіки м'якого дедлайну
+
+**WBS Ticket ID**: `TICK-FEAT-TIME-01`
+**Зв'язана вимога**: `REQ-F-005`
+**Критерій прийняття**: `AC-F-005`
+**Заблоковано тестом**: `TICK-TEST-TIME-01`
+**Цільовий модуль**: `src/submissions/deadline_service.py`
+
+#### Завдання:
+- [ ] Фіксація серверного часу збереження у форматі UTC (ISO 8601).
+- [ ] Розрахунок різниці в хвилинах з дедлайном джему.
+- [ ] Застосування конфігурованого штрафного відсотка за формулою джему."""
+              },
+              {
+                  "title": "[GATE] TICK-GATE-02: Контрольна точка якості ядра прийому та аудиту (CORE-GATE)",
+                  "milestone": "Milestone 3: CORE-GATE (Ядро сабмішнів, SHA-256 та дедлайн)",
+                  "labels": ["type:gate", "status:gate-pending", "gate:core-gate", "role:human-only", "priority:critical"],
+                  "state": "open",
+                  "body": """### 🛑 Контрольна точка CORE-GATE
+
+**WBS Ticket ID**: `TICK-GATE-02`
+**Виконавець**: Студент (Human-Only)
+**Блокуючі залежності**: `TICK-FEAT-TIME-01`, `TICK-FEAT-DIST-01`, `TICK-FEAT-HASH-01`
+
+#### Чекліст перевірки перед допуском до фази суддівства:
+- [ ] Усі задачі ядра сабмішнів реалізовані та протестовані.
+- [ ] Валідатор SHA-256 пройшов усі позитивні та негативні тести.
+- [ ] Логіка м'якого дедлайну детерміновано нараховує штрафи.
+- [ ] Покриття автотестами коду ядра становить >= 90%.
+
+**Резолюція**: Очікує перевірки людиною (Pending Human Decision)."""
+              },
+              {
+                  "title": "[TEST] TICK-TEST-AUTH-01: Тести безпеки: ізоляція робіт на етапі Under Review (403 Forbidden, BDD-SC-004)",
+                  "milestone": "Milestone 4: RELEASE-GATE (Суддівство, лідерборд, реліз)",
+                  "labels": ["type:test", "status:backlog", "role:agent", "priority:high"],
+                  "state": "open",
+                  "body": """### 🧪 Тести RBAC ізоляції закритого суддівства
+
+**WBS Ticket ID**: `TICK-TEST-AUTH-01`
+**Зв'язана вимога**: `REQ-F-006`, `REQ-NF-002`
+**BDD-сценарій**: `BDD-SC-004`
+**Блокує задачу**: `TICK-FEAT-AUTH-01`
+
+#### Кейси:
+- [ ] Спроба неавторизованого гостя отримати сирцевий код на етапі Under Review -> HTTP 403.
+- [ ] Спроба іншої команди переглянути суддівські оцінки до публікації лідерборду -> HTTP 403.
+- [ ] Успішний доступ призначеного члена журі та оргкомітету."""
+              },
+              {
+                  "title": "[FEAT] TICK-FEAT-AUTH-01: Реалізація RBAC авторизації та захисту суддівства (REQ-F-006, REQ-NF-002)",
+                  "milestone": "Milestone 4: RELEASE-GATE (Суддівство, лідерборд, реліз)",
+                  "labels": ["type:feature", "status:backlog", "role:agent", "priority:high"],
+                  "state": "open",
+                  "body": """### ✨ Реалізація RBAC захисту даних
+
+**WBS Ticket ID**: `TICK-FEAT-AUTH-01`
+**Зв'язана вимога**: `REQ-F-006`, `REQ-NF-002`
+**Критерій прийняття**: `AC-F-006`, `AC-NF-002`
+**Заблоковано тестом**: `TICK-TEST-AUTH-01`
+**Цільовий модуль**: `src/auth/`
+
+#### Завдання:
+- [ ] Middleware перевірки ролей (`Guest`, `Participant`, `Judge`, `Organizer`).
+- [ ] Фільтрація конфіденційних полів у Pydantic схемах відповіді.
+- [ ] Заборона видачі суддівських оцінок через публічні API до статусу Completed."""
+              }
+          ]
+
+          # Fetch existing issues to avoid creating duplicates
+          existing_issues = api_request(f"https://api.github.com/repos/{repo}/issues?state=all&per_page=100") or []
+          existing_titles = {iss["title"]: iss["number"] for iss in existing_issues}
+
+          print(f"Checking {len(issues_def)} defined WBS issues...")
+          created_cnt = 0
+
+          for iss in issues_def:
+              title = iss["title"]
+              m_title = iss.get("milestone")
+              m_num = milestone_map.get(m_title)
+
+              payload = {
+                  "title": title,
+                  "body": iss["body"],
+                  "labels": iss["labels"]
+              }
+              if m_num:
+                  payload["milestone"] = m_num
+
+              if title in existing_titles:
+                  print(f"Issue already exists: {title} (#{existing_titles[title]})")
+                  # Ensure state matches if closed
+                  if iss.get("state") == "closed":
+                      api_request(f"https://api.github.com/repos/{repo}/issues/{existing_titles[title]}", {"state": "closed"}, "PATCH")
+              else:
+                  print(f"Creating Issue: {title}")
+                  new_iss = api_request(f"https://api.github.com/repos/{repo}/issues", payload, "POST")
+                  if new_iss:
+                      created_cnt += 1
+                      # If issue is defined as closed (e.g., historical PLAN-GATE or resolved Bug)
+                      if iss.get("state") == "closed":
+                          api_request(f"https://api.github.com/repos/{repo}/issues/{new_iss['number']}", {"state": "closed"}, "PATCH")
+                      time.sleep(0.5)
+
+          print(f"\nAll done! Successfully created {created_cnt} new SDD issues with labels & milestones.")
+          EOF

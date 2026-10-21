@@ -1,0 +1,142 @@
+[
+  {
+    "name": "type:spec",
+    "color": "0075ca",
+    "description": "Деталізація або формалізація вимог SRS"
+  },
+  {
+    "name": "type:test",
+    "color": "e99695",
+    "description": "BDD або Unit тести (передує Feature)"
+  },
+  {
+    "name": "type:feature",
+    "color": "a2eeef",
+    "description": "Реалізація виробничого коду системи"
+  },
+  {
+    "name": "type:gate",
+    "color": "d93f0b",
+    "description": "Контрольна точка якості етапу (Human-Only)"
+  },
+  {
+    "name": "type:addendum",
+    "color": "f9d0c4",
+    "description": "Офіційна зміна до замороженої специфікації"
+  },
+  {
+    "name": "type:verification",
+    "color": "c5def5",
+    "description": "Автоматизована перевірка (CI, лінтери)"
+  },
+  {
+    "name": "type:validation",
+    "color": "bfdadc",
+    "description": "Людська валідація бізнес-задуму (UAT)"
+  },
+  {
+    "name": "type:docs",
+    "color": "0052cc",
+    "description": "Оформлення інженерної документації"
+  },
+  {
+    "name": "type:bug",
+    "color": "d73a4a",
+    "description": "Дефект або відхилення від специфікації SRS"
+  },
+  {
+    "name": "status:backlog",
+    "color": "cfd3d7",
+    "description": "Зареєстровано у беклозі на основі SRS"
+  },
+  {
+    "name": "status:ready",
+    "color": "fbca04",
+    "description": "Готово до взяття в роботу (залежності розблоковано)"
+  },
+  {
+    "name": "status:in-progress",
+    "color": "1d76db",
+    "description": "В активній розробці агентом або людиною"
+  },
+  {
+    "name": "status:verification",
+    "color": "5319e7",
+    "description": "Автоматизована перевірка тестів та лінтерів у CI"
+  },
+  {
+    "name": "status:in-review",
+    "color": "0e8a16",
+    "description": "Код-рев'ю та перевірка відповідності критеріям AC"
+  },
+  {
+    "name": "status:gate-pending",
+    "color": "e11d21",
+    "description": "Очікує рішення Stage-Gate (Human Decision)"
+  },
+  {
+    "name": "status:blocked",
+    "color": "b60205",
+    "description": "Заблоковано зовнішньою залежністю або дефектом"
+  },
+  {
+    "name": "status:done",
+    "color": "006b75",
+    "description": "Повністю виконано, тести зелені, злито в main"
+  },
+  {
+    "name": "role:human-only",
+    "color": "b60205",
+    "description": "Виключно дія людини: Gate / Addendum / UAT"
+  },
+  {
+    "name": "role:agent",
+    "color": "1f883d",
+    "description": "Автономний кодинговий агент: Feature / Test / Code"
+  },
+  {
+    "name": "role:collaborative",
+    "color": "bf4b8a",
+    "description": "Спільна робота людини та агента"
+  },
+  {
+    "name": "gate:spec-gate",
+    "color": "c2e0c6",
+    "description": "Контрольна точка затвердження SRS v1.0"
+  },
+  {
+    "name": "gate:plan-gate",
+    "color": "d4c5f9",
+    "description": "Контрольна точка декомпозиції та графіку робіт"
+  },
+  {
+    "name": "gate:core-gate",
+    "color": "fef2c0",
+    "description": "Контрольна точка ядра прийому сабмішнів та хешів"
+  },
+  {
+    "name": "gate:release-gate",
+    "color": "fad8c7",
+    "description": "Фінальна контрольна точка релізу системи"
+  },
+  {
+    "name": "priority:critical",
+    "color": "b60205",
+    "description": "Критичний шлях проєкту (CPM Critical Path)"
+  },
+  {
+    "name": "priority:high",
+    "color": "d93f0b",
+    "description": "Високий пріоритет виконання"
+  },
+  {
+    "name": "priority:medium",
+    "color": "fbca04",
+    "description": "Середній пріоритет"
+  },
+  {
+    "name": "priority:low",
+    "color": "0e8a16",
+    "description": "Низький пріоритет"
+  }
+]

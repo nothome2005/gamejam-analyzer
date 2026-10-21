@@ -1,0 +1,50 @@
+name: "🐛 Bug / Defect (Відхилення від специфікації)"
+description: "Звіт про виявлену невідповідність реалізації вимогам SRS або падіння тесту"
+title: "[BUG] <Короткий опис дефекту>"
+labels: ["type:bug", "status:in-progress"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### 🐛 Звіт про дефект (Defect Report)
+        У методології SDD багом вважається будь-яке відхилення поведінки системи від затвердженої специфікації SRS v1.0 або падіння BDD-тесту.
+
+  - type: input
+    id: violated_req
+    attributes:
+      label: "Порушена вимога або тест (Violated REQ / AC)"
+      description: "Наприклад: REQ-F-003 / AC-F-003 / BDD-SC-003"
+      placeholder: "REQ-F-XXX"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps_to_reproduce
+    attributes:
+      label: "Кроки для відтворення (Steps to Reproduce)"
+      placeholder: |
+        1. Надіслати POST /api/v1/jams/1/submissions з полем sha256 довжиною 60 символів
+        2. Очікувана реакція: 422 Unprocessable Entity
+        3. Фактична реакція: 200 OK
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual_behavior
+    attributes:
+      label: "Фактична поведінка (Actual Behavior)"
+      placeholder: "Що пішло не так?"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: "Критичність (Severity)"
+      options:
+        - "Critical (Блокує проходження Gate або падіння бази даних)"
+        - "High (Порушення ключових бізнес-правил джему)"
+        - "Medium (Косметичні або другорядні відхилення)"
+        - "Low (Побажання щодо покращення)"
+    validations:
+      required: true

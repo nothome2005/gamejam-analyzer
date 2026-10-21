@@ -1,0 +1,94 @@
+name: "✨ Feature / User Story (Реалізація функціональності)"
+description: "Задача на реалізацію виробничого коду відповідно до специфікації SRS v1.0"
+title: "[FEAT] TICK-FEAT-XXX: <Коротка назва задачі>"
+labels: ["type:feature", "status:backlog"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### 📋 Формуляр задачі на розробку фічі (SDD Workflow)
+        Відповідно до методології SDD та TDD, розробка коду (`Feature`) дозволена **виключно після** наявності відповідного тесту (`Test`), який падає (Red Phase).
+
+  - type: input
+    id: ticket_id
+    attributes:
+      label: "WBS Ticket ID"
+      description: "Ідентифікатор задачі з WBS-декомпозиції (наприклад, TICK-FEAT-SUB-01)"
+      placeholder: "TICK-FEAT-XXX"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: linked_req
+    attributes:
+      label: "Зв'язана вимога специфікації (SRS v1.0)"
+      description: "Оберіть вимогу, яку реалізує ця задача"
+      options:
+        - "REQ-F-001: Створення та конфігурація джему"
+        - "REQ-F-002: Реєстрація команд та спеціалізацій"
+        - "REQ-F-003: Подання аудиторських даних сабмішну (Git/SHA-256)"
+        - "REQ-F-004: Дистрибуція та ліміт розміру білда 500 МБ"
+        - "REQ-F-005: Підтримка регламенту м'якого дедлайну (is_late)"
+        - "REQ-F-006: Регламент статусів та захист Under Review"
+        - "REQ-F-007: Мультикритеріальне суддівське оцінювання (1-5)"
+        - "REQ-F-008: Розрахунок рейтингу та генерація лідерборду"
+        - "REQ-F-009: Аналітичний облік ігрових рушіїв"
+        - "REQ-F-010: Публічний каталог завершених проєктів"
+        - "REQ-NF-001: Продуктивність лідерборду (<= 1.5 с)"
+        - "REQ-NF-002: Безпека та ізоляція оцінок журі (RBAC)"
+        - "REQ-NF-003: Незмінний журнал аудиту змін сабмішну"
+        - "REQ-NF-004: Стійкість збереження чернеток (Draft LocalStorage)"
+        - "REQ-NF-005: Доступність інтерфейсу (WCAG 2.1 AA)"
+        - "REQ-NF-006: Модульність архітектури адаптерів Git"
+    validations:
+      required: true
+
+  - type: input
+    id: blocked_by_test
+    attributes:
+      label: "Залежність від тесту (TDD Precondition)"
+      description: "Посилання на тікет/тест, який передує розробці (наприклад, #12 або TICK-TEST-SUB-01)"
+      placeholder: "Blocked by TICK-TEST-XXX"
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: "Критерії прийняття (Acceptance Criteria, AC)"
+      description: "Конкретні спостережувані умови виконання відповідно до SRS (наприклад, AC-F-003)"
+      placeholder: |
+        - [ ] AC-F-XXX: Формат даних валідується регулярним виразом...
+        - [ ] AC-F-XXX: У разі невідповідності повертається HTTP 422...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: target_module
+    attributes:
+      label: "Цільовий модуль коду"
+      description: "Каталог у /src, де буде реалізовано логіку"
+      options:
+        - "src/jams/"
+        - "src/teams/"
+        - "src/submissions/"
+        - "src/distribution/"
+        - "src/auth/"
+        - "src/evaluations/"
+        - "src/analytics/"
+        - "src/catalog/"
+        - "src/audit/"
+        - "src/adapters/"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: role
+    attributes:
+      label: "Виконавець задачі (RACI Matrix)"
+      options:
+        - "Кодинговий агент (Agent)"
+        - "Студент (Human Lead)"
+        - "Спільна розробка (Collaborative)"
+    validations:
+      required: true

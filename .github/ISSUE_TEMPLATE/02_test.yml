@@ -1,0 +1,68 @@
+name: "🧪 Test / BDD Scenario (Розробка автотестів)"
+description: "Задача на створення BDD або Unit тестів до написання коду (TDD/ATDD)"
+title: "[TEST] TICK-TEST-XXX: <Назва тестового набору>"
+labels: ["type:test", "status:ready"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### 🧪 Формуляр тестування (TDD Red-Green Phase)
+        У методології SDD тести пишуться **до** коду на основі BDD-сценаріїв та критеріїв прийняття з матриці простежуваності.
+
+  - type: input
+    id: ticket_id
+    attributes:
+      label: "WBS Ticket ID"
+      description: "Ідентифікатор задачі (наприклад, TICK-TEST-SUB-01 або TICK-TEST-HASH-01)"
+      placeholder: "TICK-TEST-XXX"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: bdd_scenario_ref
+    attributes:
+      label: "Зв'язаний BDD-сценарій (Specification by Example)"
+      options:
+        - "BDD-SC-001: Вчасне подання гри з коректними контрольними даними"
+        - "BDD-SC-002: М'який дедлайн: подання проєкту із запізненням (штрафи)"
+        - "BDD-SC-003: Відхилення некоректного формату контрольної суми SHA-256"
+        - "BDD-SC-004: Захист конфіденційності робіт на етапі Under Review"
+        - "BDD-SC-005: Мультикритеріальне оцінювання та перерахунок рейтингу"
+        - "BDD-SC-006: Валідація перевищення максимального розміру білда 500 МБ"
+        - "Custom / Unit Suite (модульні тести компонентів)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: gherkin_scenario
+    attributes:
+      label: "Специфікація поведінки (Gherkin Given-When-Then)"
+      description: "Опишіть тестовий сценарій у нотації Gherkin"
+      value: |
+        Feature: <Назва функціоналу>
+          Scenario: <Опис випадку>
+            Given <початковий стан>
+            When <дія або тригер>
+            Then <очікуваний результат>
+    validations:
+      required: true
+
+  - type: dropdown
+    id: test_framework
+    attributes:
+      label: "Тестовий фреймворк"
+      options:
+        - "pytest-bdd / behave (BDD Acceptance Tests)"
+        - "pytest (Unit & Integration Tests)"
+        - "Lighthouse / Axe (Accessibility Tests)"
+    validations:
+      required: true
+
+  - type: input
+    id: blocks_feature
+    attributes:
+      label: "Блокує задачу Feature"
+      description: "Вкажіть тікет реалізації, який НЕ МОЖЕ стартувати без цього тесту"
+      placeholder: "Blocks TICK-FEAT-XXX"
+    validations:
+      required: true

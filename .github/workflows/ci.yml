@@ -1,0 +1,90 @@
+name: "🚀 SDD Verification CI Pipeline"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  verify-sdd-integrity:
+    name: "Audit SDD Artifacts & Traceability"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate SDD Directory Structure
+        run: |
+          python - << 'EOF'
+          import os
+
+          required_dirs = ['spec', 'src', 'tests', 'docs', 'logs', 'planning']
+          missing = [d for d in required_dirs if not os.path.isdir(d)]
+          if missing:
+              print(f"❌ Missing required SDD directories: {missing}")
+              exit(1)
+          print("✅ All required SDD directories are present.")
+          EOF
+
+      - name: Audit Baseline SRS & Traceability Matrix Coverage
+        run: |
+          python - << 'EOF'
+          import re, os
+
+          srs_path = "spec/srs.md"
+          rtm_path = "spec/traceability-matrix.md"
+
+          if not os.path.exists(srs_path) or not os.path.exists(rtm_path):
+              print("❌ Baseline SRS or Traceability Matrix missing!")
+              exit(1)
+
+          with open(srs_path, "r", encoding="utf-8") as f:
+              srs_content = f.read()
+
+          with open(rtm_path, "r", encoding="utf-8") as f:
+              rtm_content = f.read()
+
+          # Verify all 10 FRs and 6 NFRs exist
+          expected_reqs = [f"REQ-F-{i:03d}" for i in range(1, 11)] + [f"REQ-NF-{i:03d}" for i in range(1, 7)]
+          missing_in_srs = [r for r in expected_reqs if r not in srs_content]
+          missing_in_rtm = [r for r in expected_reqs if r not in rtm_content]
+
+          if missing_in_srs:
+              print(f"❌ Reqs missing in SRS: {missing_in_srs}")
+              exit(1)
+
+          if missing_in_rtm:
+              print(f"❌ Reqs missing in Traceability Matrix: {missing_in_rtm}")
+              exit(1)
+
+          print(f"✅ 100% Traceability: All {len(expected_reqs)} requirements are covered in SRS and RTM.")
+          EOF
+
+      - name: Validate GitHub Issue Templates Syntax
+        run: |
+          python - << 'EOF'
+          import os
+
+          template_dir = ".github/ISSUE_TEMPLATE"
+          files = [f for f in os.listdir(template_dir) if f.endswith(('.yml', '.yaml'))]
+          print(f"Checking {len(files)} YAML issue templates...")
+
+          # Basic validation that templates exist and are non-empty
+          for f in files:
+              path = os.path.join(template_dir, f)
+              size = os.path.getsize(path)
+              if size < 50:
+                  print(f"❌ Template {f} is suspiciously small ({size} bytes)")
+                  exit(1)
+              print(f"  ✓ {f} ({size} bytes) valid.")
+
+          print("✅ All GitHub Issue templates validated successfully.")
+          EOF

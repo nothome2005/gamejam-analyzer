@@ -1,0 +1,87 @@
+name: "🏷️ Sync GitHub Labels & Workflow"
+
+on:
+  push:
+    paths:
+      - '.github/labels.json'
+      - '.github/workflows/sync-labels.yml'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  sync-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Sync Labels via GitHub REST API
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          python - << 'EOF'
+          import os, json, urllib.request, urllib.error
+
+          token = os.environ.get("GITHUB_TOKEN")
+          repo = os.environ.get("REPO")
+          labels_file = ".github/labels.json"
+
+          if not os.path.exists(labels_file):
+              print(f"Error: {labels_file} not found!")
+              exit(1)
+
+          with open(labels_file, "r", encoding="utf-8") as f:
+              labels = json.load(f)
+
+          headers = {
+              "Authorization": f"Bearer {token}",
+              "Accept": "application/vnd.github+json",
+              "X-GitHub-Api-Version": "2022-11-28",
+              "User-Agent": "SDDGithubLabelSync"
+          }
+
+          api_url = f"https://api.github.com/repos/{repo}/labels"
+          print(f"Syncing {len(labels)} labels to {repo}...")
+
+          created, updated, errors = 0, 0, 0
+          for lbl in labels:
+              data = json.dumps({
+                  "name": lbl["name"],
+                  "color": lbl["color"],
+                  "description": lbl.get("description", "")
+              }).encode("utf-8")
+
+              # Try creating label
+              req = urllib.request.Request(api_url, data=data, headers=headers, method="POST")
+              try:
+                  with urllib.request.urlopen(req) as resp:
+                      if resp.status == 201:
+                          print(f"[CREATED] {lbl['name']}")
+                          created += 1
+              except urllib.error.HTTPError as e:
+                  if e.code == 422: # Already exists, update it
+                      import urllib.parse
+                      encoded_name = urllib.parse.quote(lbl["name"])
+                      patch_url = f"{api_url}/{encoded_name}"
+                      patch_req = urllib.request.Request(patch_url, data=data, headers=headers, method="PATCH")
+                      try:
+                          with urllib.request.urlopen(patch_req) as p_resp:
+                              print(f"[UPDATED] {lbl['name']}")
+                              updated += 1
+                      except Exception as pe:
+                          print(f"[ERROR PATCH] {lbl['name']}: {pe}")
+                          errors += 1
+                  else:
+                      print(f"[ERROR POST] {lbl['name']}: {e}")
+                      errors += 1
+
+          print(f"\nDone: Created {created}, Updated {updated}, Errors {errors}.")
+          EOF

@@ -1,0 +1,53 @@
+name: "🛑 Stage-Gate Checkpoint (Контрольна точка якості)"
+description: "Офіційний перехід між фазами проєкту (PLAN-GATE, CORE-GATE, RELEASE-GATE)"
+title: "[GATE] TICK-GATE-XX: <Назва контрольної точки>"
+labels: ["type:gate", "status:gate-pending", "role:human-only"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### 🛑 Контрольна точка якості (Stage-Gate Protocol)
+        Увага: ухвалення рішення на Gate є **виключною прерогативою людини (Human-Only)**. Агенту заборонено закривати цю задачу без підпису студента.
+
+  - type: dropdown
+    id: gate_type
+    attributes:
+      label: "Тип контрольної точки"
+      options:
+        - "TICK-GATE-01: PLAN-GATE (Затвердження декомпозиції робіт, графіку та ризиків)"
+        - "TICK-GATE-02: CORE-GATE (Проміжне ядро прийому сабмішнів, SHA-256 та дедлайну)"
+        - "TICK-GATE-03: RELEASE-GATE (Фінальний реліз системи та аудит перед здачею)"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: gate_criteria
+    attributes:
+      label: "Чекліст перевірки критеріїв проходження (Quality Checklist)"
+      options:
+        - label: "Усі залежні задачі (Blocked By) успішно переведені у статус Done"
+        - label: "Тестове покриття відповідає вимогам, усі автотести зелені (100% pass)"
+        - label: "Матриця простежуваності оновлена та актуальна"
+        - label: "Відсутні нерозв'язані дефекти критичного та високого пріоритету"
+        - label: "Оформлено офіційний протокол контрольної точки у каталозі /logs"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: decision
+    attributes:
+      label: "Резолюція людини (Human Sign-off Decision)"
+      options:
+        - "GO (Схвалено, перехід до наступної фази дозволено)"
+        - "REVISE (Повернути на доопрацювання із зауваженнями)"
+        - "ABORT (Зупинити фазу, оформити Addendum до специфікації)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: human_notes
+    attributes:
+      label: "Коментарі та обґрунтування рішення студента"
+      placeholder: "Зафіксуйте підсумки перевірки, виявлені нюанси або причини доопрацювання..."
+    validations:
+      required: true

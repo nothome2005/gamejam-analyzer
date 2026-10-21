@@ -1,0 +1,51 @@
+name: "📜 SRS Addendum (Офіційне доповнення/зміна специфікації)"
+description: "Внесення змін або розширень до замороженої специфікації вимог SRS v1.0"
+title: "[ADDENDUM] ADD-XXX: <Коротка назва зміни>"
+labels: ["type:addendum", "status:in-review", "role:human-only"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### 📜 Протокол змін специфікації (SRS Addendum)
+        Після проходження точки **SPEC-GATE** будь-які «тихі» правки у специфікації заборонені. Зміни оформлюються виключно через офіційний Адендум.
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: "Причина зміни (Why is this change necessary?)"
+      description: "Чому виникла необхідність зміни або доповнення після проходження SPEC-GATE?"
+      placeholder: "Опишіть виявлені технічні обмеження або нові бізнес-правила..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: affected_reqs
+    attributes:
+      label: "Зачеплені вимоги (Affected Requirements)"
+      description: "Перелічіть ідентифікатори вимог, які змінюються або додаються (наприклад, REQ-F-003, REQ-NF-001)"
+      placeholder: "- REQ-F-003: зміна валідації...\n- REQ-F-011 (NEW): додавання нового функціоналу..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact_analysis
+    attributes:
+      label: "Аналіз впливу на систему (Impact Analysis)"
+      description: "Які тести, модулі коду та документація підлягають оновленню?"
+      placeholder: |
+        - Тести: оновлення BDD-SC-003
+        - Модулі: src/submissions/
+        - Матриця: оновлення spec/traceability-matrix.md
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: "Чекліст узгодження"
+      options:
+        - label: "Оновлено текстову специфікацію spec/srs.md та spec/srs.tex"
+        - label: "Оновлено матрицю простежуваності spec/traceability-matrix.md"
+        - label: "Рішення затверджено студентом (Lead Engineer)"
+    validations:
+      required: true

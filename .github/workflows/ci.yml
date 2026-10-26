@@ -1,4 +1,4 @@
-name: "🚀 SDD Verification CI Pipeline"
+name: "SDD Verification CI Pipeline"
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   verify-sdd-integrity:
-    name: "Audit SDD Artifacts & Traceability"
+    name: "Audit SDD Artifacts, Traceability and Tests"
     runs-on: ubuntu-latest
 
     steps:
@@ -21,6 +21,11 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Install Test Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+
       - name: Validate SDD Directory Structure
         run: |
           python - << 'EOF'
@@ -29,21 +34,21 @@ jobs:
           required_dirs = ['spec', 'src', 'tests', 'docs', 'logs', 'planning']
           missing = [d for d in required_dirs if not os.path.isdir(d)]
           if missing:
-              print(f"❌ Missing required SDD directories: {missing}")
+              print(f"Error: Missing required SDD directories: {missing}")
               exit(1)
-          print("✅ All required SDD directories are present.")
+          print("OK: All required SDD directories are present.")
           EOF
 
-      - name: Audit Baseline SRS & Traceability Matrix Coverage
+      - name: Audit Baseline SRS and Traceability Matrix Coverage
         run: |
           python - << 'EOF'
-          import re, os
+          import os
 
           srs_path = "spec/srs.md"
           rtm_path = "spec/traceability-matrix.md"
 
           if not os.path.exists(srs_path) or not os.path.exists(rtm_path):
-              print("❌ Baseline SRS or Traceability Matrix missing!")
+              print("Error: Baseline SRS or Traceability Matrix missing!")
               exit(1)
 
           with open(srs_path, "r", encoding="utf-8") as f:
@@ -58,14 +63,14 @@ jobs:
           missing_in_rtm = [r for r in expected_reqs if r not in rtm_content]
 
           if missing_in_srs:
-              print(f"❌ Reqs missing in SRS: {missing_in_srs}")
+              print(f"Error: Reqs missing in SRS: {missing_in_srs}")
               exit(1)
 
           if missing_in_rtm:
-              print(f"❌ Reqs missing in Traceability Matrix: {missing_in_rtm}")
+              print(f"Error: Reqs missing in Traceability Matrix: {missing_in_rtm}")
               exit(1)
 
-          print(f"✅ 100% Traceability: All {len(expected_reqs)} requirements are covered in SRS and RTM.")
+          print(f"OK: 100% Traceability: All {len(expected_reqs)} requirements are covered in SRS and RTM.")
           EOF
 
       - name: Validate GitHub Issue Templates Syntax
@@ -77,14 +82,17 @@ jobs:
           files = [f for f in os.listdir(template_dir) if f.endswith(('.yml', '.yaml'))]
           print(f"Checking {len(files)} YAML issue templates...")
 
-          # Basic validation that templates exist and are non-empty
           for f in files:
               path = os.path.join(template_dir, f)
               size = os.path.getsize(path)
               if size < 50:
-                  print(f"❌ Template {f} is suspiciously small ({size} bytes)")
+                  print(f"Error: Template {f} is suspiciously small ({size} bytes)")
                   exit(1)
-              print(f"  ✓ {f} ({size} bytes) valid.")
+              print(f"  OK: {f} ({size} bytes) valid.")
 
-          print("✅ All GitHub Issue templates validated successfully.")
+          print("OK: All GitHub Issue templates validated successfully.")
           EOF
+
+      - name: Run Pytest Suite (Unit and BDD Acceptance Tests)
+        run: |
+          pytest tests -v

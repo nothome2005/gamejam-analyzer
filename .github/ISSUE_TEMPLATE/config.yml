@@ -1,11 +1,11 @@
 blank_issues_enabled: false
 contact_links:
-  - name: 📖 Специфікація вимог (SRS v1.0)
+  - name: Специфікація вимог (SRS v1.0)
     url: https://github.com/nothome2005/gamejam-analyzer/blob/main/spec/srs.md
     about: Нормативний еталон вимог до системи Game Jam Analyzer
-  - name: 🗺️ Регламент трекера задач та WBS
+  - name: Регламент трекера задач та WBS
     url: https://github.com/nothome2005/gamejam-analyzer/blob/main/planning/issue-tracker-workflow.md
     about: Регламент переходів статусів задач та повний реєстр тікетів
-  - name: 📊 Матриця простежуваності (RTM)
+  - name: Матриця простежуваності (RTM)
     url: https://github.com/nothome2005/gamejam-analyzer/blob/main/spec/traceability-matrix.md
     about: Наскрізний зв'язок між вимогами, AC, BDD та кодом

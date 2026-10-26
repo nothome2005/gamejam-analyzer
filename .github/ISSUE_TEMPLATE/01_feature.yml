@@ -1,4 +1,4 @@
-name: "✨ Feature / User Story (Реалізація функціональності)"
+name: "Feature / User Story (Реалізація функціональності)"
 description: "Задача на реалізацію виробничого коду відповідно до специфікації SRS v1.0"
 title: "[FEAT] TICK-FEAT-XXX: <Коротка назва задачі>"
 labels: ["type:feature", "status:backlog"]
@@ -6,8 +6,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        ### 📋 Формуляр задачі на розробку фічі (SDD Workflow)
-        Відповідно до методології SDD та TDD, розробка коду (`Feature`) дозволена **виключно після** наявності відповідного тесту (`Test`), який падає (Red Phase).
+        ### Формуляр задачі на розробку фічі (SDD Workflow)
+        Відповідно до методології SDD та TDD, розробка коду (Feature) дозволена виключно за наявності відповідного тесту (Test), який падає (Red Phase).
 
   - type: input
     id: ticket_id

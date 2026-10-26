@@ -1,4 +1,4 @@
-name: "🛑 Stage-Gate Checkpoint (Контрольна точка якості)"
+name: "Stage-Gate Checkpoint (Контрольна точка якості)"
 description: "Офіційний перехід між фазами проєкту (PLAN-GATE, CORE-GATE, RELEASE-GATE)"
 title: "[GATE] TICK-GATE-XX: <Назва контрольної точки>"
 labels: ["type:gate", "status:gate-pending", "role:human-only"]
@@ -6,8 +6,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        ### 🛑 Контрольна точка якості (Stage-Gate Protocol)
-        Увага: ухвалення рішення на Gate є **виключною прерогативою людини (Human-Only)**. Агенту заборонено закривати цю задачу без підпису студента.
+        ### Контрольна точка якості (Stage-Gate Protocol)
+        Увага: ухвалення рішення на Gate є виключною прерогативою людини (Human-Only). Агенту заборонено закривати цю задачу без підпису студента.
 
   - type: dropdown
     id: gate_type

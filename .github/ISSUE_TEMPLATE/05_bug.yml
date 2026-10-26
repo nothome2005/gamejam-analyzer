@@ -1,4 +1,4 @@
-name: "🐛 Bug / Defect (Відхилення від специфікації)"
+name: "Bug / Defect (Відхилення від специфікації)"
 description: "Звіт про виявлену невідповідність реалізації вимогам SRS або падіння тесту"
 title: "[BUG] <Короткий опис дефекту>"
 labels: ["type:bug", "status:in-progress"]
@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        ### 🐛 Звіт про дефект (Defect Report)
+        ### Звіт про дефект (Defect Report)
         У методології SDD багом вважається будь-яке відхилення поведінки системи від затвердженої специфікації SRS v1.0 або падіння BDD-тесту.
 
   - type: input

@@ -1,4 +1,4 @@
-name: "🏷️ Sync GitHub Labels & Workflow"
+name: "Sync GitHub Labels & Workflow"
 
 on:
   push:

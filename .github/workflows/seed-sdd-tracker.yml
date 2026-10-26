@@ -1,4 +1,4 @@
-name: "🌱 Seed SDD Issues & Milestones"
+name: "Seed SDD Issues and Milestones"
 
 on:
   push:
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   seed-tracker:
-    name: "Bootstrap GitHub Issues & Milestones from WBS"
+    name: "Bootstrap GitHub Issues and Milestones from WBS"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -66,7 +66,7 @@ jobs:
                       encoded = urllib.parse.quote(lbl["name"])
                       api_request(f"{labels_url}/{encoded}", lbl_payload, "PATCH")
 
-          # 2. Create Milestones
+          # 2. Create or Update Milestones
           milestones_def = [
               {"title": "Milestone 1: SPEC-GATE (Вимоги SRS v1.0)", "state": "closed", "desc": "Затвердження нормативної специфікації вимог IEEE 830 та BDD-сценаріїв"},
               {"title": "Milestone 2: PLAN-GATE (Декомпозиція робіт та графік)", "state": "closed", "desc": "Затвердження WBS декомпозиції, мережевого графіку CPM та реєстру ризиків"},
@@ -89,14 +89,15 @@ jobs:
                       milestone_map[m["title"]] = m_res["number"]
                       time.sleep(0.5)
 
-          # 3. Create realistic SDD issues
+          # 3. Clean issues without any emojis
           issues_def = [
               {
+                  "ticket_id": "TICK-GATE-01",
                   "title": "[GATE] TICK-GATE-01: Затвердження плану декомпозиції робіт та реєстру ризиків (PLAN-GATE)",
                   "milestone": "Milestone 2: PLAN-GATE (Декомпозиція робіт та графік)",
                   "labels": ["type:gate", "status:done", "gate:plan-gate", "role:human-only", "priority:critical"],
                   "state": "closed",
-                  "body": """### 🛑 Контрольна точка PLAN-GATE (Затверджено)
+                  "body": """### Контрольна точка PLAN-GATE (Затверджено)
 
 **WBS Ticket ID**: `TICK-GATE-01`
 **Виконавець**: Студент (Lead Engineer / Human-Only)
@@ -106,21 +107,22 @@ jobs:
 - `planning/risk-register.md`
 - `planning/project_schedule_cpm.graphml`
 
-#### ✅ Чекліст критеріїв PLAN-GATE:
+#### Чекліст критеріїв PLAN-GATE:
 - [x] Повна WBS декомпозиція системи на 31 тікет (розділення Feature і Test за TDD).
 - [x] Розраховано критичний шлях (CPM): тривалість 25.5 годин, резерви часу виявлено.
 - [x] Побудовано діаграму Ганта та схему життєвого циклу завдань у yEd GraphML.
 - [x] Сформовано реєстр із 8 проєктних ризиків зі стратегіями пом'якшення.
-- [x] Підписано офіційний протокол `logs/plan-gate.md`.
+- [x] Підписано офіційний протокол logs/plan-gate.md.
 
-**Резолюція**: **GO (Схвалено людиною)**."""
+**Резолюція**: GO (Схвалено людиною)."""
               },
               {
+                  "ticket_id": "ADD-001",
                   "title": "[ADDENDUM] ADD-001: Доповнення формату декларації сторонніх асетів у Asset Inventory",
                   "milestone": "Milestone 2: PLAN-GATE (Декомпозиція робіт та графік)",
                   "labels": ["type:addendum", "status:done", "role:human-only", "priority:medium"],
                   "state": "closed",
-                  "body": """### 📜 SRS Addendum Protocol
+                  "body": """### SRS Addendum Protocol
 
 **ID Адендуму**: `ADD-001`
 **Зачеплені вимоги**: `REQ-F-003` (Подання аудиторських даних сабмішну)
@@ -132,23 +134,25 @@ jobs:
 - [x] Рішення затверджено людиною."""
               },
               {
+                  "ticket_id": "BUG-01",
                   "title": "[BUG] Дефект валідації верхнього регістру у 64-символьному хеші SHA-256",
                   "milestone": "Milestone 3: CORE-GATE (Ядро сабмішнів, SHA-256 та дедлайн)",
                   "labels": ["type:bug", "status:done", "role:agent", "priority:high"],
                   "state": "closed",
-                  "body": """### 🐛 Звіт про дефект
+                  "body": """### Звіт про дефект
 
 **Порушена вимога**: `REQ-F-003` / `AC-F-003`
 **Опис**: Регулярний вираз на фронтенді спочатку підтримував тільки lowercase `^[a-f0-9]{64}$`, що призводило до помилкового відхилення хешів, згенерованих деякими утилітами у верхньому регістрі.
 
-**Виправлення**: Оновлено regex до `^[a-fA-F0-9]{64}$` та додано нормалізацію через `.lower()`."""
+**Виправлення**: Оновлено regex до `^[a-fA-F0-9]{64}$` та додано нормалізацію через .lower()."""
               },
               {
-                  "title": "[SPEC] TICK-SPEC-01: Формалізація OpenAPI/Swagger специфікації ендпоінтів Game Jam Analyzer",
+                  "ticket_id": "TICK-SPEC-01",
+                  "title": "[SPEC] TICK-SPEC-01: Формалізація OpenAPI специфікації ендпоінтів Game Jam Analyzer",
                   "milestone": "Milestone 3: CORE-GATE (Ядро сабмішнів, SHA-256 та дедлайн)",
                   "labels": ["type:spec", "status:ready", "role:collaborative", "priority:high"],
                   "state": "open",
-                  "body": """### 📋 Задача на формалізацію OpenAPI контракту
+                  "body": """### Задача на формалізацію OpenAPI контракту
 
 **WBS Ticket ID**: `TICK-SPEC-01`
 **Зв'язані вимоги**: `REQ-F-001` .. `REQ-F-010`
@@ -162,11 +166,12 @@ jobs:
 - [ ] Опис відповіді лідерборду `GET /jams/{id}/leaderboard` (REQ-F-008)."""
               },
               {
-                  "title": "[TEST] TICK-TEST-JAM-01: BDD/Unit тести валідації регламенту джему (AC-F-001)",
+                  "ticket_id": "TICK-TEST-JAM-01",
+                  "title": "[TEST] TICK-TEST-JAM-01: BDD та Unit тести валідації регламенту джему (AC-F-001)",
                   "milestone": "Milestone 3: CORE-GATE (Ядро сабмішнів, SHA-256 та дедлайн)",
                   "labels": ["type:test", "status:ready", "role:agent", "priority:high"],
                   "state": "open",
-                  "body": """### 🧪 Розробка автотестів (TDD Red Phase)
+                  "body": """### Розробка автотестів (TDD Red Phase)
 
 **WBS Ticket ID**: `TICK-TEST-JAM-01`
 **Зв'язана вимога**: `REQ-F-001` (Створення та конфігурація джему)
@@ -179,11 +184,12 @@ jobs:
 - [ ] Негативний тест спроби задати `review_deadline` раніше за дедлайн робіт."""
               },
               {
+                  "ticket_id": "TICK-FEAT-JAM-01",
                   "title": "[FEAT] TICK-FEAT-JAM-01: Модель та API створення і конфігурації джему (src/jams)",
                   "milestone": "Milestone 3: CORE-GATE (Ядро сабмішнів, SHA-256 та дедлайн)",
                   "labels": ["type:feature", "status:backlog", "role:agent", "priority:high"],
                   "state": "open",
-                  "body": """### ✨ Реалізація виробничого коду
+                  "body": """### Реалізація виробничого коду
 
 **WBS Ticket ID**: `TICK-FEAT-JAM-01`
 **Зв'язана вимога**: `REQ-F-001`
@@ -197,11 +203,12 @@ jobs:
 - [ ] Прогнати тести до отримання статусу 100% Green."""
               },
               {
+                  "ticket_id": "TICK-TEST-SUB-01",
                   "title": "[TEST] TICK-TEST-SUB-01: Тести аудиторських реквізитів гри: Git URL та Asset Inventory (AC-F-003)",
                   "milestone": "Milestone 3: CORE-GATE (Ядро сабмішнів, SHA-256 та дедлайн)",
                   "labels": ["type:test", "status:backlog", "role:agent", "priority:critical"],
                   "state": "open",
-                  "body": """### 🧪 Автотести аудиту сабмішну
+                  "body": """### Автотести аудиту сабмішну
 
 **WBS Ticket ID**: `TICK-TEST-SUB-01`
 **Зв'язана вимога**: `REQ-F-003` (Подання аудиторських даних)
@@ -215,11 +222,12 @@ jobs:
 - [ ] Перевірка структури списку сторонніх асетів (Asset Inventory)."""
               },
               {
+                  "ticket_id": "TICK-TEST-HASH-01",
                   "title": "[TEST] TICK-TEST-HASH-01: Негативні та граничні BDD-тести перевірки SHA-256 хешу (BDD-SC-003)",
                   "milestone": "Milestone 3: CORE-GATE (Ядро сабмішнів, SHA-256 та дедлайн)",
                   "labels": ["type:test", "status:in-progress", "role:agent", "priority:critical"],
                   "state": "open",
-                  "body": """### 🧪 Тести валідації криптографічного хешу
+                  "body": """### Тести валідації криптографічного хешу
 
 **WBS Ticket ID**: `TICK-TEST-HASH-01`
 **Зв'язана вимога**: `REQ-F-003`
@@ -235,11 +243,12 @@ Scenario: Спроба надіслати некоректний хеш SHA-256
 ```"""
               },
               {
+                  "ticket_id": "TICK-FEAT-HASH-01",
                   "title": "[FEAT] TICK-FEAT-HASH-01: Криптографічний валідатор хешу SHA-256 (64 hex regex, src/submissions)",
                   "milestone": "Milestone 3: CORE-GATE (Ядро сабмішнів, SHA-256 та дедлайн)",
                   "labels": ["type:feature", "status:backlog", "role:agent", "priority:critical"],
                   "state": "open",
-                  "body": """### ✨ Реалізація валідатора цілісності коду
+                  "body": """### Реалізація валідатора цілісності коду
 
 **WBS Ticket ID**: `TICK-FEAT-HASH-01`
 **Критичний шлях (CPM)**: Так (Critical Path)
@@ -250,15 +259,16 @@ Scenario: Спроба надіслати некоректний хеш SHA-256
 
 #### Завдання:
 - [ ] Реалізувати регулярний вираз `^[a-fA-F0-9]{64}$`.
-- [ ] Реалізувати асинхронний метод `verify_remote_archive_hash()`.
+- [ ] Реалізувати метод `verify_remote_archive_hash()`.
 - [ ] Забезпечити захист від ReDoS та ін'єкцій."""
               },
               {
+                  "ticket_id": "TICK-TEST-TIME-01",
                   "title": "[TEST] TICK-TEST-TIME-01: BDD-тести обробки м'якого дедлайну: облік is_late та штрафів (BDD-SC-002)",
                   "milestone": "Milestone 3: CORE-GATE (Ядро сабмішнів, SHA-256 та дедлайн)",
                   "labels": ["type:test", "status:backlog", "role:agent", "priority:high"],
                   "state": "open",
-                  "body": """### 🧪 Тести м'якого дедлайну (Human Override Logic)
+                  "body": """### Тести м'якого дедлайну (Human Override Logic)
 
 **WBS Ticket ID**: `TICK-TEST-TIME-01`
 **Зв'язана вимога**: `REQ-F-005` (Підтримка регламенту м'якого дедлайну)
@@ -272,11 +282,12 @@ Scenario: Спроба надіслати некоректний хеш SHA-256
 - [ ] Подання після `review_deadline` -> відхилення запиту."""
               },
               {
+                  "ticket_id": "TICK-FEAT-TIME-01",
                   "title": "[FEAT] TICK-FEAT-TIME-01: Модуль обліку м'якого дедлайну та нарахування штрафів (REQ-F-005)",
                   "milestone": "Milestone 3: CORE-GATE (Ядро сабмішнів, SHA-256 та дедлайн)",
                   "labels": ["type:feature", "status:backlog", "role:agent", "priority:high"],
                   "state": "open",
-                  "body": """### ✨ Реалізація логіки м'якого дедлайну
+                  "body": """### Реалізація логіки м'якого дедлайну
 
 **WBS Ticket ID**: `TICK-FEAT-TIME-01`
 **Зв'язана вимога**: `REQ-F-005`
@@ -290,11 +301,12 @@ Scenario: Спроба надіслати некоректний хеш SHA-256
 - [ ] Застосування конфігурованого штрафного відсотка за формулою джему."""
               },
               {
+                  "ticket_id": "TICK-GATE-02",
                   "title": "[GATE] TICK-GATE-02: Контрольна точка якості ядра прийому та аудиту (CORE-GATE)",
                   "milestone": "Milestone 3: CORE-GATE (Ядро сабмішнів, SHA-256 та дедлайн)",
                   "labels": ["type:gate", "status:gate-pending", "gate:core-gate", "role:human-only", "priority:critical"],
                   "state": "open",
-                  "body": """### 🛑 Контрольна точка CORE-GATE
+                  "body": """### Контрольна точка CORE-GATE
 
 **WBS Ticket ID**: `TICK-GATE-02`
 **Виконавець**: Студент (Human-Only)
@@ -309,11 +321,12 @@ Scenario: Спроба надіслати некоректний хеш SHA-256
 **Резолюція**: Очікує перевірки людиною (Pending Human Decision)."""
               },
               {
+                  "ticket_id": "TICK-TEST-AUTH-01",
                   "title": "[TEST] TICK-TEST-AUTH-01: Тести безпеки: ізоляція робіт на етапі Under Review (403 Forbidden, BDD-SC-004)",
                   "milestone": "Milestone 4: RELEASE-GATE (Суддівство, лідерборд, реліз)",
                   "labels": ["type:test", "status:backlog", "role:agent", "priority:high"],
                   "state": "open",
-                  "body": """### 🧪 Тести RBAC ізоляції закритого суддівства
+                  "body": """### Тести RBAC ізоляції закритого суддівства
 
 **WBS Ticket ID**: `TICK-TEST-AUTH-01`
 **Зв'язана вимога**: `REQ-F-006`, `REQ-NF-002`
@@ -326,11 +339,12 @@ Scenario: Спроба надіслати некоректний хеш SHA-256
 - [ ] Успішний доступ призначеного члена журі та оргкомітету."""
               },
               {
+                  "ticket_id": "TICK-FEAT-AUTH-01",
                   "title": "[FEAT] TICK-FEAT-AUTH-01: Реалізація RBAC авторизації та захисту суддівства (REQ-F-006, REQ-NF-002)",
                   "milestone": "Milestone 4: RELEASE-GATE (Суддівство, лідерборд, реліз)",
                   "labels": ["type:feature", "status:backlog", "role:agent", "priority:high"],
                   "state": "open",
-                  "body": """### ✨ Реалізація RBAC захисту даних
+                  "body": """### Реалізація RBAC захисту даних
 
 **WBS Ticket ID**: `TICK-FEAT-AUTH-01`
 **Зв'язана вимога**: `REQ-F-006`, `REQ-NF-002`
@@ -339,18 +353,26 @@ Scenario: Спроба надіслати некоректний хеш SHA-256
 **Цільовий модуль**: `src/auth/`
 
 #### Завдання:
-- [ ] Middleware перевірки ролей (`Guest`, `Participant`, `Judge`, `Organizer`).
+- [ ] Middleware перевірки ролей (Guest, Participant, Judge, Organizer).
 - [ ] Фільтрація конфіденційних полів у Pydantic схемах відповіді.
 - [ ] Заборона видачі суддівських оцінок через публічні API до статусу Completed."""
               }
           ]
 
-          # Fetch existing issues to avoid creating duplicates
+          # Fetch existing issues to update them or create if missing
           existing_issues = api_request(f"https://api.github.com/repos/{repo}/issues?state=all&per_page=100") or []
-          existing_titles = {iss["title"]: iss["number"] for iss in existing_issues}
 
-          print(f"Checking {len(issues_def)} defined WBS issues...")
-          created_cnt = 0
+          # Build matching dictionary: check if title or ticket_id matches
+          issue_by_key = {}
+          for iss in existing_issues:
+              title_str = iss["title"]
+              issue_by_key[title_str] = iss
+              for item in issues_def:
+                  if item["ticket_id"] in title_str:
+                      issue_by_key[item["ticket_id"]] = iss
+
+          print(f"Synchronizing {len(issues_def)} defined WBS issues...")
+          synced_cnt = 0
 
           for iss in issues_def:
               title = iss["title"]
@@ -365,20 +387,24 @@ Scenario: Спроба надіслати некоректний хеш SHA-256
               if m_num:
                   payload["milestone"] = m_num
 
-              if title in existing_titles:
-                  print(f"Issue already exists: {title} (#{existing_titles[title]})")
-                  # Ensure state matches if closed
+              matched_iss = issue_by_key.get(iss["ticket_id"]) or issue_by_key.get(title)
+
+              if matched_iss:
+                  iss_num = matched_iss["number"]
+                  print(f"Updating Issue #{iss_num}: {title} (clean title/body without emojis)")
                   if iss.get("state") == "closed":
-                      api_request(f"https://api.github.com/repos/{repo}/issues/{existing_titles[title]}", {"state": "closed"}, "PATCH")
+                      payload["state"] = "closed"
+                  api_request(f"https://api.github.com/repos/{repo}/issues/{iss_num}", payload, "PATCH")
+                  synced_cnt += 1
+                  time.sleep(0.4)
               else:
-                  print(f"Creating Issue: {title}")
+                  print(f"Creating new Issue: {title}")
                   new_iss = api_request(f"https://api.github.com/repos/{repo}/issues", payload, "POST")
                   if new_iss:
-                      created_cnt += 1
-                      # If issue is defined as closed (e.g., historical PLAN-GATE or resolved Bug)
+                      synced_cnt += 1
                       if iss.get("state") == "closed":
                           api_request(f"https://api.github.com/repos/{repo}/issues/{new_iss['number']}", {"state": "closed"}, "PATCH")
-                      time.sleep(0.5)
+                      time.sleep(0.4)
 
-          print(f"\nAll done! Successfully created {created_cnt} new SDD issues with labels & milestones.")
+          print(f"\nCompleted: Synced {synced_cnt} issues without emojis.")
           EOF

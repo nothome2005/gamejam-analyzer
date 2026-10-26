@@ -1,0 +1,343 @@
+openapi: 3.0.3
+info:
+  title: Game Jam Analyzer REST API
+  description: OpenAPI 3.0 specification for Game Jam Analyzer platform (TICK-SPEC-01, REQ-F-001..010)
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local development server
+
+paths:
+  /jams:
+    get:
+      summary: Get all jams
+      operationId: getJams
+      responses:
+        '200':
+          description: List of game jams
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JamResponse'
+    post:
+      summary: Create a new game jam (REQ-F-001)
+      operationId: createJam
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JamCreate'
+      responses:
+        '201':
+          description: Jam created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JamResponse'
+        '422':
+          description: Validation error (e.g. invalid dates)
+
+  /jams/{jam_id}:
+    get:
+      summary: Get jam details by ID
+      operationId: getJamById
+      parameters:
+        - name: jam_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Jam details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JamResponse'
+        '404':
+          description: Jam not found
+
+  /jams/{jam_id}/submissions:
+    get:
+      summary: Get submissions for a jam
+      operationId: getSubmissions
+      parameters:
+        - name: jam_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of submissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubmissionResponse'
+    post:
+      summary: Submit a project (REQ-F-003, REQ-F-005)
+      operationId: submitProject
+      parameters:
+        - name: jam_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmissionCreate'
+      responses:
+        '201':
+          description: Submission accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionResponse'
+        '422':
+          description: Invalid SHA-256 or validation error
+
+  /submissions/{submission_id}/verify-hash:
+    post:
+      summary: Verify SHA-256 checksum against remote repository
+      operationId: verifyHash
+      parameters:
+        - name: submission_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Checksum verification result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  verified:
+                    type: boolean
+                  sha256_checksum:
+                    type: string
+
+  /submissions/{submission_id}/evaluations:
+    post:
+      summary: Submit judge evaluation (REQ-F-007)
+      operationId: addEvaluation
+      parameters:
+        - name: submission_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationCreate'
+      responses:
+        '201':
+          description: Evaluation recorded
+        '403':
+          description: Unauthorized to evaluate this submission
+
+  /jams/{jam_id}/leaderboard:
+    get:
+      summary: Get leaderboard (REQ-F-008, REQ-NF-001)
+      operationId: getLeaderboard
+      parameters:
+        - name: jam_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Sorted leaderboard
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaderboardItem'
+
+  /analytics/engines:
+    get:
+      summary: Get game engine usage analytics (REQ-F-009)
+      operationId: getEngineAnalytics
+      responses:
+        '200':
+          description: Engine analytics report
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EngineStat'
+
+components:
+  schemas:
+    JamCreate:
+      type: object
+      required:
+        - title
+        - theme
+        - start_time
+        - submission_deadline
+        - review_deadline
+      properties:
+        title:
+          type: string
+          example: "Winter Indie Jam 2026"
+        theme:
+          type: string
+          example: "Isolation and Discovery"
+        start_time:
+          type: string
+          format: date-time
+        submission_deadline:
+          type: string
+          format: date-time
+        review_deadline:
+          type: string
+          format: date-time
+        penalty_per_hour_percent:
+          type: number
+          default: 5.0
+
+    JamResponse:
+      allOf:
+        - $ref: '#/components/schemas/JamCreate'
+        - type: object
+          properties:
+            id:
+              type: string
+            status:
+              type: string
+              enum: [Created, Active, Under Review, Completed]
+
+    SubmissionCreate:
+      type: object
+      required:
+        - title
+        - engine
+        - git_url
+        - commit_hash
+        - sha256_checksum
+        - build_url
+        - build_size_mb
+      properties:
+        title:
+          type: string
+          example: "Frostbite Odyssey"
+        engine:
+          type: string
+          example: "Godot 4.3"
+        git_url:
+          type: string
+          format: uri
+          example: "https://github.com/pixelcrafters/frostbite-game.git"
+        commit_hash:
+          type: string
+          example: "e4d909c290d0fb1ca068ffaddf22cbd0a6042db5"
+        sha256_checksum:
+          type: string
+          pattern: '^[a-fA-F0-9]{64}$'
+          example: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        build_url:
+          type: string
+          format: uri
+          example: "https://pixelcrafters.itch.io/frostbite-odyssey"
+        build_size_mb:
+          type: number
+          maximum: 500
+          example: 120.5
+        asset_inventory:
+          type: array
+          items:
+            type: string
+
+    SubmissionResponse:
+      allOf:
+        - $ref: '#/components/schemas/SubmissionCreate'
+        - type: object
+          properties:
+            id:
+              type: string
+            status:
+              type: string
+              enum: [Draft, Submitted, Under Review, Completed]
+            is_late:
+              type: boolean
+            late_minutes:
+              type: integer
+            penalty_points:
+              type: number
+
+    EvaluationCreate:
+      type: object
+      required:
+        - gameplay
+        - theme_relevance
+        - graphics
+        - audio
+        - code_quality
+      properties:
+        gameplay:
+          type: integer
+          minimum: 1
+          maximum: 5
+        theme_relevance:
+          type: integer
+          minimum: 1
+          maximum: 5
+        graphics:
+          type: integer
+          minimum: 1
+          maximum: 5
+        audio:
+          type: integer
+          minimum: 1
+          maximum: 5
+        code_quality:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+
+    LeaderboardItem:
+      type: object
+      properties:
+        rank:
+          type: integer
+        submission_id:
+          type: string
+        title:
+          type: string
+        team_name:
+          type: string
+        raw_score:
+          type: number
+        penalty_points:
+          type: number
+        final_score:
+          type: number
+
+    EngineStat:
+      type: object
+      properties:
+        engine:
+          type: string
+        count:
+          type: integer
+        percentage:
+          type: number

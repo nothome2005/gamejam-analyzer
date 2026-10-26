@@ -1,4 +1,4 @@
-name: "🧪 Test / BDD Scenario (Розробка автотестів)"
+name: "Test / BDD Scenario (Розробка автотестів)"
 description: "Задача на створення BDD або Unit тестів до написання коду (TDD/ATDD)"
 title: "[TEST] TICK-TEST-XXX: <Назва тестового набору>"
 labels: ["type:test", "status:ready"]
@@ -6,8 +6,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        ### 🧪 Формуляр тестування (TDD Red-Green Phase)
-        У методології SDD тести пишуться **до** коду на основі BDD-сценаріїв та критеріїв прийняття з матриці простежуваності.
+        ### Формуляр тестування (TDD Red-Green Phase)
+        У методології SDD тести пишуться до коду на основі BDD-сценаріїв та критеріїв прийняття з матриці простежуваності.
 
   - type: input
     id: ticket_id

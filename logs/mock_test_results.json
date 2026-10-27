@@ -1,0 +1,174 @@
+{
+  "timestamp": "2026-10-27T15:48:42Z",
+  "total_scenarios": 15,
+  "passed": 15,
+  "failed": 0,
+  "pass_rate_percent": 100.0,
+  "tests": [
+    {
+      "id": "POS-01",
+      "name": "Створення нового джему (REQ-F-001)",
+      "method": "POST",
+      "uri": "/jams",
+      "expected_code": 201,
+      "actual_code": 201,
+      "latency_ms": 14.87,
+      "status": "PASS",
+      "detail": "Status: 201, Jam ID: jam-winter-2026"
+    },
+    {
+      "id": "POS-02",
+      "name": "Отримання списку активних джемів (REQ-F-001)",
+      "method": "GET",
+      "uri": "/jams?status=Active",
+      "expected_code": 200,
+      "actual_code": 200,
+      "latency_ms": 15.77,
+      "status": "PASS",
+      "detail": "Returned 1 jams"
+    },
+    {
+      "id": "POS-03",
+      "name": "Реєстрація команди та інвайт-коду (REQ-F-002)",
+      "method": "POST",
+      "uri": "/jams/{id}/teams",
+      "expected_code": 201,
+      "actual_code": 201,
+      "latency_ms": 15.19,
+      "status": "PASS",
+      "detail": "Invite Code: PXL-7788"
+    },
+    {
+      "id": "POS-04",
+      "name": "Реєстрація сабмішну з аудитом коду (REQ-F-003..005)",
+      "method": "POST",
+      "uri": "/jams/{id}/submissions",
+      "expected_code": 201,
+      "actual_code": 201,
+      "latency_ms": 1.2,
+      "status": "PASS",
+      "detail": "Sub ID: sub-frostbite-42, is_late=False"
+    },
+    {
+      "id": "POS-05",
+      "name": "Верифікація цілісності SHA-256 та коміту (REQ-F-003)",
+      "method": "POST",
+      "uri": "/submissions/{id}/verify-hash",
+      "expected_code": 200,
+      "actual_code": 200,
+      "latency_ms": 14.06,
+      "status": "PASS",
+      "detail": "Verified: True"
+    },
+    {
+      "id": "POS-06",
+      "name": "Мультикритеріальне оцінювання журі 1-5 (REQ-F-007)",
+      "method": "POST",
+      "uri": "/submissions/{id}/evaluations",
+      "expected_code": 201,
+      "actual_code": 201,
+      "latency_ms": 14.76,
+      "status": "PASS",
+      "detail": "Eval ID: eval-101, Judge: judge-07"
+    },
+    {
+      "id": "POS-07",
+      "name": "Автоматичний розрахунок лідерборду (REQ-F-008)",
+      "method": "GET",
+      "uri": "/jams/{id}/leaderboard",
+      "expected_code": 200,
+      "actual_code": 200,
+      "latency_ms": 15.28,
+      "status": "PASS",
+      "detail": "Top-1: Frostbite Odyssey, Score=4.6"
+    },
+    {
+      "id": "POS-08",
+      "name": "Аналітика використання рушіїв (REQ-F-009)",
+      "method": "GET",
+      "uri": "/analytics/engines",
+      "expected_code": 200,
+      "actual_code": 200,
+      "latency_ms": 14.63,
+      "status": "PASS",
+      "detail": "Top Engine: Godot (45.71%)"
+    },
+    {
+      "id": "POS-09",
+      "name": "Публічний каталог проєктів з фільтром (REQ-F-010)",
+      "method": "GET",
+      "uri": "/catalog/projects?engine=Godot",
+      "expected_code": 200,
+      "actual_code": 200,
+      "latency_ms": 15.21,
+      "status": "PASS",
+      "detail": "Catalog items: 1"
+    },
+    {
+      "id": "NEG-01",
+      "name": "Некоректний хеш SHA-256 (BDD-SC-003, AC-F-003)",
+      "method": "POST",
+      "uri": "/jams/{id}/submissions",
+      "expected_code": 422,
+      "actual_code": 422,
+      "latency_ms": 0.97,
+      "status": "PASS",
+      "detail": "RFC 7807 Type: https://gamejam-analyzer.local/errors/unprocessable-entity"
+    },
+    {
+      "id": "NEG-02",
+      "name": "Перевищення ліміту білда > 500 МБ (BDD-SC-006, AC-F-004)",
+      "method": "POST",
+      "uri": "/jams/{id}/submissions",
+      "expected_code": 422,
+      "actual_code": 422,
+      "latency_ms": 0.74,
+      "status": "PASS",
+      "detail": "RFC 7807 Detail: Розмір білда перевищує допустимий ліміт джему (500 МБ)."
+    },
+    {
+      "id": "NEG-03",
+      "name": "Суддівський бал поза межами 1-5 (AC-F-007)",
+      "method": "POST",
+      "uri": "/submissions/{id}/evaluations",
+      "expected_code": 422,
+      "actual_code": 422,
+      "latency_ms": 0.67,
+      "status": "PASS",
+      "detail": "RFC 7807 Title: Unprocessable Entity"
+    },
+    {
+      "id": "NEG-04",
+      "name": "Неавторизований доступ в Under Review (BDD-SC-004, REQ-F-006)",
+      "method": "GET",
+      "uri": "/submissions/{id}",
+      "expected_code": 403,
+      "actual_code": 403,
+      "latency_ms": 0.66,
+      "status": "PASS",
+      "detail": "RFC 7807 Detail: Доступ до сабмішну обмежено. Етап джему: Under Review. Доступ дозволено лише суддям та оргкомітету."
+    },
+    {
+      "id": "NEG-05",
+      "name": "Запит неіснуючого ресурсу джему (404 Not Found)",
+      "method": "GET",
+      "uri": "/jams/jam-unknown-999",
+      "expected_code": 404,
+      "actual_code": 404,
+      "latency_ms": 0.62,
+      "status": "PASS",
+      "detail": "RFC 7807 Instance: /jams/jam-unknown-999"
+    },
+    {
+      "id": "NEG-06",
+      "name": "Конфлікт повторної участі у двох командах (AC-F-002, 409)",
+      "method": "POST",
+      "uri": "/teams/{id}/members",
+      "expected_code": 409,
+      "actual_code": 409,
+      "latency_ms": 0.66,
+      "status": "PASS",
+      "detail": "RFC 7807 Detail: Учасник уже зареєстрований у складі іншої команди цього джему."
+    }
+  ]
+}

@@ -1,190 +1,1032 @@
 openapi: 3.0.3
 info:
   title: Game Jam Analyzer REST API
-  description: OpenAPI 3.0 specification for Game Jam Analyzer platform (TICK-SPEC-01, REQ-F-001..010)
+  description: >-
+    Офіційна специфікація REST API для інформаційної системи обліку, аудиту доброчесності
+    та статистичного аналізу ігрових джемів «Game Jam Analyzer».
+    Спроєктовано за методологією API-First у SDD-конвеєрі (TICK-SPEC-01, REQ-F-001..REQ-F-010).
   version: 1.0.0
+  contact:
+    name: Маслов Андрій (гр. КН-31), Antigravity AI Agent
+    email: student@kpi.ua
+
 servers:
-  - url: http://localhost:8000/api/v1
-    description: Local development server
+  - url: http://localhost:4010
+    description: Mock API сервер (Stoplight Prism)
+  - url: http://localhost:8000
+    description: Локальний сервер розробки (FastAPI / ASGI)
+
+security:
+  - BearerAuth: []
+  - RoleAuth: []
 
 paths:
-  /jams:
+  /health:
     get:
-      summary: Get all jams
-      operationId: getJams
+      summary: Перевірка працездатності сервісу
+      description: Повертає поточний стан сервісу, версію API та системний час сервера в UTC.
+      operationId: getHealthStatus
+      security: []
       responses:
         '200':
-          description: List of game jams
+          description: Сервіс функціонує в штатному режимі
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: "healthy"
+                version: "1.0.0"
+                server_time_utc: "2026-10-27T00:30:00Z"
+
+  /jams:
+    get:
+      summary: Отримати список джемів
+      description: Повертає перелік ігрових джемів із можливістю фільтрації за поточним статусом.
+      operationId: getJams
+      x-req-id: "REQ-F-001"
+      security: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          description: Фільтр за життєвим циклом джему
+          schema:
+            type: string
+            enum: [Created, Active, Under Review, Completed]
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Успішне повернення списку джемів
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/JamResponse'
+              example:
+                - id: "jam-winter-2026"
+                  title: "Winter Indie Jam 2026"
+                  theme: "Isolation and Discovery"
+                  start_time: "2026-10-01T10:00:00Z"
+                  submission_deadline: "2026-10-02T20:00:00Z"
+                  review_deadline: "2026-10-05T20:00:00Z"
+                  penalty_per_hour_percent: 5.0
+                  status: "Active"
+                  created_at: "2026-09-25T12:00:00Z"
+
     post:
-      summary: Create a new game jam (REQ-F-001)
+      summary: Створити новий ігровий джем
+      description: Створення нового джему організатором із валідацією часових рамок та регламенту штрафів.
       operationId: createJam
+      x-req-id: "REQ-F-001"
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/JamCreate'
+            example:
+              title: "Winter Indie Jam 2026"
+              theme: "Isolation and Discovery"
+              start_time: "2026-10-01T10:00:00Z"
+              submission_deadline: "2026-10-02T20:00:00Z"
+              review_deadline: "2026-10-05T20:00:00Z"
+              penalty_per_hour_percent: 5.0
       responses:
         '201':
-          description: Jam created successfully
+          description: Джем успішно створено
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/JamResponse'
+              example:
+                id: "jam-winter-2026"
+                title: "Winter Indie Jam 2026"
+                theme: "Isolation and Discovery"
+                start_time: "2026-10-01T10:00:00Z"
+                submission_deadline: "2026-10-02T20:00:00Z"
+                review_deadline: "2026-10-05T20:00:00Z"
+                penalty_per_hour_percent: 5.0
+                status: "Created"
+                created_at: "2026-09-25T12:00:00Z"
+        '400':
+          $ref: '#/components/responses/400BadRequest'
         '422':
-          description: Validation error (e.g. invalid dates)
+          $ref: '#/components/responses/422UnprocessableEntity'
 
   /jams/{jam_id}:
     get:
-      summary: Get jam details by ID
+      summary: Отримати детальну інформацію про джем
+      description: Повертає повну картку джему за його унікальним ідентифікатором.
       operationId: getJamById
+      x-req-id: "REQ-F-001"
+      security: []
       parameters:
         - name: jam_id
           in: path
           required: true
+          description: Унікальний ідентифікатор джему
           schema:
             type: string
+          example: "jam-winter-2026"
       responses:
         '200':
-          description: Jam details
+          description: Деталі джему
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/JamResponse'
+              example:
+                id: "jam-winter-2026"
+                title: "Winter Indie Jam 2026"
+                theme: "Isolation and Discovery"
+                start_time: "2026-10-01T10:00:00Z"
+                submission_deadline: "2026-10-02T20:00:00Z"
+                review_deadline: "2026-10-05T20:00:00Z"
+                penalty_per_hour_percent: 5.0
+                status: "Active"
+                created_at: "2026-09-25T12:00:00Z"
         '404':
-          description: Jam not found
+          $ref: '#/components/responses/404NotFound'
 
-  /jams/{jam_id}/submissions:
-    get:
-      summary: Get submissions for a jam
-      operationId: getSubmissions
+  /jams/{jam_id}/status:
+    patch:
+      summary: Змінити життєвий статус джему
+      description: Переведення джему організатором у наступну фазу (Created -> Active -> Under Review -> Completed).
+      operationId: updateJamStatus
+      x-req-id: "REQ-F-001"
       parameters:
         - name: jam_id
           in: path
           required: true
           schema:
             type: string
+          example: "jam-winter-2026"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JamStatusUpdate'
+            example:
+              status: "Under Review"
       responses:
         '200':
-          description: List of submissions
+          description: Статус джему успішно оновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JamResponse'
+              example:
+                id: "jam-winter-2026"
+                title: "Winter Indie Jam 2026"
+                theme: "Isolation and Discovery"
+                start_time: "2026-10-01T10:00:00Z"
+                submission_deadline: "2026-10-02T20:00:00Z"
+                review_deadline: "2026-10-05T20:00:00Z"
+                penalty_per_hour_percent: 5.0
+                status: "Under Review"
+                created_at: "2026-09-25T12:00:00Z"
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '422':
+          $ref: '#/components/responses/422UnprocessableEntity'
+
+  /jams/{jam_id}/teams:
+    get:
+      summary: Отримати список команд джему
+      description: Повертає перелік зареєстрованих команд у межах джему.
+      operationId: getJamTeams
+      x-req-id: "REQ-F-002"
+      security: []
+      parameters:
+        - name: jam_id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "jam-winter-2026"
+      responses:
+        '200':
+          description: Список команд
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TeamResponse'
+              example:
+                - id: "team-pixelcrafters"
+                  jam_id: "jam-winter-2026"
+                  name: "PixelCrafters"
+                  captain_id: "user-andrii"
+                  invite_code: "PXL-7788"
+                  members:
+                    - user_id: "user-andrii"
+                      username: "Andrii"
+                      specialization: "Gameplay Programmer"
+                    - user_id: "user-olena"
+                      username: "Olena"
+                      specialization: "2D/3D Artist"
+                  created_at: "2026-10-01T11:00:00Z"
+        '404':
+          $ref: '#/components/responses/404NotFound'
+
+    post:
+      summary: Зареєструвати нову команду для участі в джемі
+      description: Створення команди учасником-капітаном та автоматична генерація інвайт-коду.
+      operationId: createTeam
+      x-req-id: "REQ-F-002"
+      parameters:
+        - name: jam_id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "jam-winter-2026"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamCreate'
+            example:
+              name: "PixelCrafters"
+              captain_specialization: "Gameplay Programmer"
+      responses:
+        '201':
+          description: Команду успішно зареєстровано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+              example:
+                id: "team-pixelcrafters"
+                jam_id: "jam-winter-2026"
+                name: "PixelCrafters"
+                captain_id: "user-andrii"
+                invite_code: "PXL-7788"
+                members:
+                  - user_id: "user-andrii"
+                    username: "Andrii"
+                    specialization: "Gameplay Programmer"
+                created_at: "2026-10-01T11:00:00Z"
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '409':
+          $ref: '#/components/responses/409Conflict'
+
+  /teams/{team_id}:
+    get:
+      summary: Отримати детальну картку команди
+      description: Повертає відомості про команду, список учасників та їхні спеціалізації.
+      operationId: getTeamById
+      x-req-id: "REQ-F-002"
+      security: []
+      parameters:
+        - name: team_id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "team-pixelcrafters"
+      responses:
+        '200':
+          description: Картка команди
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+
+  /teams/{team_id}/members:
+    post:
+      summary: Приєднатися до команди за інвайт-кодом
+      description: Додавання нового учасника до команди із зазначенням спеціалізації.
+      operationId: joinTeam
+      x-req-id: "REQ-F-002"
+      parameters:
+        - name: team_id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "team-pixelcrafters"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddMemberRequest'
+            example:
+              invite_code: "PXL-7788"
+              specialization: "Sound Designer"
+      responses:
+        '200':
+          description: Учасника успішно додано до команди
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '409':
+          $ref: '#/components/responses/409Conflict'
+
+  /teams/{team_id}/members/{user_id}:
+    delete:
+      summary: Видалити учасника зі складу команди
+      description: Виключення учасника капітаном команди до настання дедлайну прийому робіт.
+      operationId: removeTeamMember
+      x-req-id: "REQ-F-002"
+      parameters:
+        - name: team_id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "team-pixelcrafters"
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "user-olena"
+      responses:
+        '204':
+          description: Учасника успішно вилучено
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+
+  /jams/{jam_id}/submissions:
+    get:
+      summary: Отримати список сабмішнів джему
+      description: Повертає список зареєстрованих робіт. На етапі Under Review діє RBAC обмеження.
+      operationId: getSubmissions
+      x-req-id: "REQ-F-003"
+      parameters:
+        - name: jam_id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "jam-winter-2026"
+      responses:
+        '200':
+          description: Список поданих проєктів
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/SubmissionResponse'
+              example:
+                - id: "sub-frostbite-42"
+                  jam_id: "jam-winter-2026"
+                  team_id: "team-pixelcrafters"
+                  title: "Frostbite Odyssey"
+                  engine: "Godot 4.3"
+                  git_url: "https://github.com/pixelcrafters/frostbite-game.git"
+                  commit_hash: "e4d909c290d0fb1ca068ffaddf22cbd0a6042db5"
+                  sha256_checksum: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                  build_url: "https://pixelcrafters.itch.io/frostbite-odyssey"
+                  build_size_mb: 120.5
+                  asset_inventory:
+                    - "Kenney Audio Pack (CC0)"
+                    - "Custom 2D Pixel Sprites"
+                  status: "Submitted"
+                  is_late: false
+                  late_minutes: 0
+                  penalty_points: 0.0
+                  submitted_at: "2026-10-02T18:00:00Z"
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+
     post:
-      summary: Submit a project (REQ-F-003, REQ-F-005)
+      summary: Подати конкурсний проєкт на джем (Submission)
+      description: Реєстрація сабмішну капітаном із перевіркою Git URL, валідацією 64-символьного SHA-256, дистрибуції до 500 МБ та розрахунком Soft Deadline.
       operationId: submitProject
+      x-req-id: "REQ-F-003"
       parameters:
         - name: jam_id
           in: path
           required: true
           schema:
             type: string
+          example: "jam-winter-2026"
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/SubmissionCreate'
+            example:
+              team_id: "team-pixelcrafters"
+              title: "Frostbite Odyssey"
+              engine: "Godot 4.3"
+              git_url: "https://github.com/pixelcrafters/frostbite-game.git"
+              commit_hash: "e4d909c290d0fb1ca068ffaddf22cbd0a6042db5"
+              sha256_checksum: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              build_url: "https://pixelcrafters.itch.io/frostbite-odyssey"
+              build_size_mb: 120.5
+              asset_inventory:
+                - "Kenney Audio Pack (CC0)"
+                - "Custom 2D Pixel Sprites"
       responses:
         '201':
-          description: Submission accepted
+          description: Проєкт успішно зареєстровано в системі
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SubmissionResponse'
+              example:
+                id: "sub-frostbite-42"
+                jam_id: "jam-winter-2026"
+                team_id: "team-pixelcrafters"
+                title: "Frostbite Odyssey"
+                engine: "Godot 4.3"
+                git_url: "https://github.com/pixelcrafters/frostbite-game.git"
+                commit_hash: "e4d909c290d0fb1ca068ffaddf22cbd0a6042db5"
+                sha256_checksum: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                build_url: "https://pixelcrafters.itch.io/frostbite-odyssey"
+                build_size_mb: 120.5
+                asset_inventory:
+                  - "Kenney Audio Pack (CC0)"
+                  - "Custom 2D Pixel Sprites"
+                status: "Submitted"
+                is_late: false
+                late_minutes: 0
+                penalty_points: 0.0
+                submitted_at: "2026-10-02T18:00:00Z"
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
         '422':
-          description: Invalid SHA-256 or validation error
+          $ref: '#/components/responses/422UnprocessableEntity'
 
-  /submissions/{submission_id}/verify-hash:
-    post:
-      summary: Verify SHA-256 checksum against remote repository
-      operationId: verifyHash
+  /submissions/{submission_id}:
+    get:
+      summary: Отримати деталі сабмішну
+      description: Повертає картку сабмішну. На етапі Under Review доступ обмежено для суперників та гостей.
+      operationId: getSubmissionById
+      x-req-id: "REQ-F-006"
       parameters:
         - name: submission_id
           in: path
           required: true
           schema:
             type: string
+          example: "sub-frostbite-42"
       responses:
         '200':
-          description: Checksum verification result
+          description: Деталі проєкту
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  verified:
-                    type: boolean
-                  sha256_checksum:
-                    type: string
+                $ref: '#/components/schemas/SubmissionResponse'
+              example:
+                id: "sub-frostbite-42"
+                jam_id: "jam-winter-2026"
+                team_id: "team-pixelcrafters"
+                title: "Frostbite Odyssey"
+                engine: "Godot 4.3"
+                git_url: "https://github.com/pixelcrafters/frostbite-game.git"
+                commit_hash: "e4d909c290d0fb1ca068ffaddf22cbd0a6042db5"
+                sha256_checksum: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                build_url: "https://pixelcrafters.itch.io/frostbite-odyssey"
+                build_size_mb: 120.5
+                asset_inventory:
+                  - "Kenney Audio Pack (CC0)"
+                  - "Custom 2D Pixel Sprites"
+                status: "Submitted"
+                is_late: false
+                late_minutes: 0
+                penalty_points: 0.0
+                submitted_at: "2026-10-02T18:00:00Z"
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
 
-  /submissions/{submission_id}/evaluations:
-    post:
-      summary: Submit judge evaluation (REQ-F-007)
-      operationId: addEvaluation
+    put:
+      summary: Оновити чернетку або ревізію проєкту
+      description: Модифікація сабмішну капітаном до завершення прийому або під час м'якого дедлайну.
+      operationId: updateSubmission
+      x-req-id: "REQ-F-003"
       parameters:
         - name: submission_id
           in: path
           required: true
           schema:
             type: string
+          example: "sub-frostbite-42"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmissionUpdate'
+      responses:
+        '200':
+          description: Проєкт успішно оновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionResponse'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '422':
+          $ref: '#/components/responses/422UnprocessableEntity'
+
+  /submissions/{submission_id}/verify-hash:
+    post:
+      summary: Перевірити відповідність контрольної суми SHA-256
+      description: Запуск серверної перевірки незмінності коду та збігу хеш-суми релізу з Git-репозиторієм.
+      operationId: verifyHash
+      x-req-id: "REQ-F-003"
+      parameters:
+        - name: submission_id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "sub-frostbite-42"
+      responses:
+        '200':
+          description: Результат перевірки контрольної суми
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HashVerifyResponse'
+              example:
+                submission_id: "sub-frostbite-42"
+                verified: true
+                sha256_checksum: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                git_commit_verified: true
+                message: "Контрольна сума SHA-256 та релізний коміт повністю збігаються."
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '422':
+          $ref: '#/components/responses/422UnprocessableEntity'
+
+  /submissions/{submission_id}/evaluations:
+    get:
+      summary: Отримати список оцінок та рецензій сабмішну
+      description: Повертає список оцінок суддів. До завершення джему доступ мають лише судді та організатори.
+      operationId: getEvaluations
+      x-req-id: "REQ-F-006"
+      parameters:
+        - name: submission_id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "sub-frostbite-42"
+      responses:
+        '200':
+          description: Перелік оцінок проєкту
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EvaluationResponse'
+              example:
+                - id: "eval-101"
+                  submission_id: "sub-frostbite-42"
+                  judge_id: "judge-07"
+                  gameplay: 5
+                  theme_relevance: 4
+                  graphics: 4
+                  audio: 5
+                  code_quality: 5
+                  comment: "Відмінна оптимізація шейдерів у Godot"
+                  created_at: "2026-10-03T14:30:00Z"
+        '403':
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+
+    post:
+      summary: Надіслати суддівську оцінку проєкту
+      description: Фіксація оцінки членом журі за 5 критеріями (шкала 1-5) та опціональним текстовим коментарем.
+      operationId: addEvaluation
+      x-req-id: "REQ-F-007"
+      parameters:
+        - name: submission_id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "sub-frostbite-42"
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/EvaluationCreate'
+            example:
+              gameplay: 5
+              theme_relevance: 4
+              graphics: 4
+              audio: 5
+              code_quality: 5
+              comment: "Відмінна оптимізація шейдерів у Godot"
       responses:
         '201':
-          description: Evaluation recorded
+          description: Оцінку успішно зафіксовано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationResponse'
+              example:
+                id: "eval-101"
+                submission_id: "sub-frostbite-42"
+                judge_id: "judge-07"
+                gameplay: 5
+                theme_relevance: 4
+                graphics: 4
+                audio: 5
+                code_quality: 5
+                comment: "Відмінна оптимізація шейдерів у Godot"
+                created_at: "2026-10-03T14:30:00Z"
+        '400':
+          $ref: '#/components/responses/400BadRequest'
         '403':
-          description: Unauthorized to evaluate this submission
+          $ref: '#/components/responses/403Forbidden'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '422':
+          $ref: '#/components/responses/422UnprocessableEntity'
 
   /jams/{jam_id}/leaderboard:
     get:
-      summary: Get leaderboard (REQ-F-008, REQ-NF-001)
+      summary: Отримати турнірну таблицю (Leaderboard)
+      description: Детермінований розрахунок ранжованого списку проєктів із урахуванням середніх оцінок та штрафів за запізнення.
       operationId: getLeaderboard
+      x-req-id: "REQ-F-008"
+      security: []
       parameters:
         - name: jam_id
           in: path
           required: true
           schema:
             type: string
+          example: "jam-winter-2026"
       responses:
         '200':
-          description: Sorted leaderboard
+          description: Відсортований лідерборд джему
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/LeaderboardItem'
+              example:
+                - rank: 1
+                  submission_id: "sub-frostbite-42"
+                  title: "Frostbite Odyssey"
+                  team_name: "PixelCrafters"
+                  engine: "Godot 4.3"
+                  raw_score: 4.60
+                  penalty_points: 0.00
+                  final_score: 4.60
+                - rank: 2
+                  submission_id: "sub-neondash-19"
+                  title: "Neon Dash"
+                  team_name: "RetroSquad"
+                  engine: "Unity 6"
+                  raw_score: 4.20
+                  penalty_points: 0.38
+                  final_score: 3.82
+        '404':
+          $ref: '#/components/responses/404NotFound'
 
   /analytics/engines:
     get:
-      summary: Get game engine usage analytics (REQ-F-009)
-      operationId: getEngineAnalytics
+      summary: Отримати глобальну статистику використання ігрових рушіїв
+      description: Агрегація популярності ігрових рушіїв (Godot, Unity, Unreal Engine, Custom) по всій системі.
+      operationId: getGlobalEngineAnalytics
+      x-req-id: "REQ-F-009"
+      security: []
       responses:
         '200':
-          description: Engine analytics report
+          description: Звіт популярності ігрових рушіїв
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/EngineStat'
+              example:
+                - engine: "Godot"
+                  count: 48
+                  percentage: 45.71
+                - engine: "Unity"
+                  count: 36
+                  percentage: 34.29
+                - engine: "Unreal Engine"
+                  count: 14
+                  percentage: 13.33
+                - engine: "Custom C++"
+                  count: 7
+                  percentage: 6.67
+
+  /jams/{jam_id}/analytics/engines:
+    get:
+      summary: Отримати статистику використання рушіїв у межах конкретного джему
+      description: Розподіл ігрових технологій для обраного ігрового джему.
+      operationId: getJamEngineAnalytics
+      x-req-id: "REQ-F-009"
+      security: []
+      parameters:
+        - name: jam_id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "jam-winter-2026"
+      responses:
+        '200':
+          description: Статистика рушіїв для джему
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EngineStat'
+              example:
+                - engine: "Godot 4.3"
+                  count: 12
+                  percentage: 60.0
+                - engine: "Unity 6"
+                  count: 5
+                  percentage: 25.0
+                - engine: "Custom Framework"
+                  count: 3
+                  percentage: 15.0
+        '404':
+          $ref: '#/components/responses/404NotFound'
+
+  /catalog/jams:
+    get:
+      summary: Отримати публічний каталог завершених джемів
+      description: Публічна галерея архівних джемів із призовими роботами для гостей та гравців.
+      operationId: getCatalogJams
+      x-req-id: "REQ-F-010"
+      security: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Публічний перелік джемів
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JamResponse'
+
+  /catalog/projects:
+    get:
+      summary: Публічний каталог проєктів з фільтрацією та пагінацією
+      description: Пошук і перегляд ігор завершених джемів з фільтрами за рушієм, назвою та призовим місцем.
+      operationId: getCatalogProjects
+      x-req-id: "REQ-F-010"
+      security: []
+      parameters:
+        - name: engine
+          in: query
+          required: false
+          schema:
+            type: string
+          example: "Godot"
+        - name: jam_id
+          in: query
+          required: false
+          schema:
+            type: string
+          example: "jam-winter-2026"
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Список проєктів для публічного огляду
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CatalogProjectItem'
+              example:
+                - id: "sub-frostbite-42"
+                  jam_id: "jam-winter-2026"
+                  jam_title: "Winter Indie Jam 2026"
+                  title: "Frostbite Odyssey"
+                  team_name: "PixelCrafters"
+                  engine: "Godot 4.3"
+                  build_url: "https://pixelcrafters.itch.io/frostbite-odyssey"
+                  rank: 1
+                  final_score: 4.60
 
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Bearer JWT токен авторизації користувача
+    RoleAuth:
+      type: apiKey
+      in: header
+      name: X-User-Role
+      description: Рольовий заголовок для тестування (Guest, Participant, Judge, Organizer)
+
+  responses:
+    400BadRequest:
+      description: Некоректний синтаксис запиту або невалідні параметри
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: "https://gamejam-analyzer.local/errors/bad-request"
+            title: "Bad Request"
+            status: 400
+            detail: "Помилка у структурі вхідних даних або форматі запиту."
+            instance: "/api/v1/jams"
+
+    403Forbidden:
+      description: Доступ заборонено (порушення прав доступу або режим Under Review)
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: "https://gamejam-analyzer.local/errors/forbidden"
+            title: "Forbidden"
+            status: 403
+            detail: "Доступ до сабмішну обмежено. Етап джему: Under Review. Доступ дозволено лише суддям та оргкомітету."
+            instance: "/api/v1/submissions/sub-frostbite-42"
+
+    404NotFound:
+      description: Запитуваний ресурс не знайдено
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: "https://gamejam-analyzer.local/errors/not-found"
+            title: "Not Found"
+            status: 404
+            detail: "Запитуваний ресурс з ідентифікатором 'jam-unknown' не знайдено."
+            instance: "/api/v1/jams/jam-unknown"
+
+    409Conflict:
+      description: Конфлікт стану ресурсу (наприклад, повторне входження до команди)
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: "https://gamejam-analyzer.local/errors/conflict"
+            title: "Conflict"
+            status: 409
+            detail: "Учасник уже зареєстрований у складі іншої команди цього джему."
+            instance: "/api/v1/teams/team-pixelcrafters/members"
+
+    422UnprocessableEntity:
+      description: Помилка бізнес-валідації семантики даних (SHA-256 хеш, діапазон балів, ліміт ваги)
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: "https://gamejam-analyzer.local/errors/unprocessable-entity"
+            title: "Unprocessable Entity"
+            status: 422
+            detail: "Поле 'sha256_checksum' повинно містити рівно 64 шістнадцяткові символи."
+            instance: "/api/v1/jams/jam-winter-2026/submissions"
+            invalid_params:
+              - name: "sha256_checksum"
+                reason: "Значення не відповідає регулярному виразу ^[a-fA-F0-9]{64}$"
+
   schemas:
+    ProblemDetails:
+      type: object
+      description: Єдина модель повідомлення про помилку згідно зі стандартом RFC 7807 (Problem Details for HTTP APIs).
+      required:
+        - type
+        - title
+        - status
+        - detail
+      properties:
+        type:
+          type: string
+          format: uri
+          description: URI ідентифікатор типу проблеми
+          example: "https://gamejam-analyzer.local/errors/validation-error"
+        title:
+          type: string
+          description: Короткий зрозумілий опис проблеми
+          example: "Unprocessable Entity"
+        status:
+          type: integer
+          description: Числовий код стану HTTP
+          example: 422
+        detail:
+          type: string
+          description: Детальне пояснення конкретної причини виникнення помилки
+          example: "Поле 'sha256_checksum' не відповідає стандарту SHA-256 (64 hex-символи)."
+        instance:
+          type: string
+          description: URI ресурсу, де сталася помилка
+          example: "/api/v1/jams/jam-winter-2026/submissions"
+        invalid_params:
+          type: array
+          description: Перелік невалідних полів та причин їх відхилення
+          items:
+            type: object
+            required:
+              - name
+              - reason
+            properties:
+              name:
+                type: string
+                example: "sha256_checksum"
+              reason:
+                type: string
+                example: "Довжина рядка повинна бути рівно 64 символи"
+
+    HealthResponse:
+      type: object
+      required:
+        - status
+        - version
+        - server_time_utc
+      properties:
+        status:
+          type: string
+          example: "healthy"
+        version:
+          type: string
+          example: "1.0.0"
+        server_time_utc:
+          type: string
+          format: date-time
+          example: "2026-10-27T00:30:00Z"
+
     JamCreate:
       type: object
       required:
@@ -196,37 +1038,162 @@ components:
       properties:
         title:
           type: string
+          minLength: 3
+          maxLength: 120
           example: "Winter Indie Jam 2026"
         theme:
           type: string
+          minLength: 3
+          maxLength: 250
           example: "Isolation and Discovery"
         start_time:
           type: string
           format: date-time
+          example: "2026-10-01T10:00:00Z"
         submission_deadline:
           type: string
           format: date-time
+          example: "2026-10-02T20:00:00Z"
         review_deadline:
           type: string
           format: date-time
+          example: "2026-10-05T20:00:00Z"
         penalty_per_hour_percent:
           type: number
+          minimum: 0.0
+          maximum: 100.0
           default: 5.0
+          example: 5.0
+
+    JamStatusUpdate:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum: [Created, Active, Under Review, Completed]
+          example: "Under Review"
 
     JamResponse:
       allOf:
         - $ref: '#/components/schemas/JamCreate'
         - type: object
+          required:
+            - id
+            - status
+            - created_at
           properties:
             id:
               type: string
+              example: "jam-winter-2026"
             status:
               type: string
               enum: [Created, Active, Under Review, Completed]
+              example: "Active"
+            created_at:
+              type: string
+              format: date-time
+              example: "2026-09-25T12:00:00Z"
+
+    TeamCreate:
+      type: object
+      required:
+        - name
+        - captain_specialization
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 80
+          example: "PixelCrafters"
+        captain_specialization:
+          type: string
+          enum:
+            - Gameplay Programmer
+            - 2D/3D Artist
+            - Sound Designer
+            - Level Designer
+            - Game Designer
+            - Narrative Designer / Writer
+          example: "Gameplay Programmer"
+
+    TeamMember:
+      type: object
+      required:
+        - user_id
+        - username
+        - specialization
+      properties:
+        user_id:
+          type: string
+          example: "user-andrii"
+        username:
+          type: string
+          example: "Andrii"
+        specialization:
+          type: string
+          example: "Gameplay Programmer"
+
+    AddMemberRequest:
+      type: object
+      required:
+        - invite_code
+        - specialization
+      properties:
+        invite_code:
+          type: string
+          example: "PXL-7788"
+        specialization:
+          type: string
+          enum:
+            - Gameplay Programmer
+            - 2D/3D Artist
+            - Sound Designer
+            - Level Designer
+            - Game Designer
+            - Narrative Designer / Writer
+          example: "Sound Designer"
+
+    TeamResponse:
+      type: object
+      required:
+        - id
+        - jam_id
+        - name
+        - captain_id
+        - invite_code
+        - members
+        - created_at
+      properties:
+        id:
+          type: string
+          example: "team-pixelcrafters"
+        jam_id:
+          type: string
+          example: "jam-winter-2026"
+        name:
+          type: string
+          example: "PixelCrafters"
+        captain_id:
+          type: string
+          example: "user-andrii"
+        invite_code:
+          type: string
+          example: "PXL-7788"
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/TeamMember'
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-10-01T11:00:00Z"
 
     SubmissionCreate:
       type: object
       required:
+        - team_id
         - title
         - engine
         - git_url
@@ -235,8 +1202,13 @@ components:
         - build_url
         - build_size_mb
       properties:
+        team_id:
+          type: string
+          example: "team-pixelcrafters"
         title:
           type: string
+          minLength: 2
+          maxLength: 100
           example: "Frostbite Odyssey"
         engine:
           type: string
@@ -247,10 +1219,12 @@ components:
           example: "https://github.com/pixelcrafters/frostbite-game.git"
         commit_hash:
           type: string
+          pattern: '^[a-fA-F0-9]{40}$'
           example: "e4d909c290d0fb1ca068ffaddf22cbd0a6042db5"
         sha256_checksum:
           type: string
           pattern: '^[a-fA-F0-9]{64}$'
+          description: 64-значний шістнадцятковий криптографічний хеш SHA-256
           example: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         build_url:
           type: string
@@ -258,8 +1232,40 @@ components:
           example: "https://pixelcrafters.itch.io/frostbite-odyssey"
         build_size_mb:
           type: number
-          maximum: 500
+          minimum: 0.1
+          maximum: 500.0
+          description: Задекларований розмір дистрибутиву (ліміт регламенту - до 500 МБ)
           example: 120.5
+        asset_inventory:
+          type: array
+          description: Перелік сторонніх асетів для аудиту оригінальності
+          items:
+            type: string
+          example:
+            - "Kenney Audio Pack (CC0)"
+            - "Custom 2D Pixel Sprites"
+
+    SubmissionUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "Frostbite Odyssey: Enhanced Edition"
+        git_url:
+          type: string
+          format: uri
+        commit_hash:
+          type: string
+          pattern: '^[a-fA-F0-9]{40}$'
+        sha256_checksum:
+          type: string
+          pattern: '^[a-fA-F0-9]{64}$'
+        build_url:
+          type: string
+          format: uri
+        build_size_mb:
+          type: number
+          maximum: 500.0
         asset_inventory:
           type: array
           items:
@@ -269,21 +1275,70 @@ components:
       allOf:
         - $ref: '#/components/schemas/SubmissionCreate'
         - type: object
+          required:
+            - id
+            - jam_id
+            - status
+            - is_late
+            - late_minutes
+            - penalty_points
+            - submitted_at
           properties:
             id:
               type: string
+              example: "sub-frostbite-42"
+            jam_id:
+              type: string
+              example: "jam-winter-2026"
             status:
               type: string
               enum: [Draft, Submitted, Under Review, Completed]
+              example: "Submitted"
             is_late:
               type: boolean
+              description: Ознака подання після настання submission_deadline
+              example: false
             late_minutes:
               type: integer
+              description: Кількість хвилин запізнення
+              example: 0
             penalty_points:
               type: number
+              description: Розрахований штрафний бал
+              example: 0.0
+            submitted_at:
+              type: string
+              format: date-time
+              example: "2026-10-02T18:00:00Z"
+
+    HashVerifyResponse:
+      type: object
+      required:
+        - submission_id
+        - verified
+        - sha256_checksum
+        - git_commit_verified
+        - message
+      properties:
+        submission_id:
+          type: string
+          example: "sub-frostbite-42"
+        verified:
+          type: boolean
+          example: true
+        sha256_checksum:
+          type: string
+          example: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        git_commit_verified:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Контрольна сума SHA-256 та релізний коміт повністю збігаються."
 
     EvaluationCreate:
       type: object
+      description: Оцінка проєкту членом журі за 5 зваженими критеріями від 1 до 5 балів.
       required:
         - gameplay
         - theme_relevance
@@ -295,49 +1350,148 @@ components:
           type: integer
           minimum: 1
           maximum: 5
+          example: 5
         theme_relevance:
           type: integer
           minimum: 1
           maximum: 5
+          example: 4
         graphics:
           type: integer
           minimum: 1
           maximum: 5
+          example: 4
         audio:
           type: integer
           minimum: 1
           maximum: 5
+          example: 5
         code_quality:
           type: integer
           minimum: 1
           maximum: 5
+          example: 5
         comment:
           type: string
+          maxLength: 1000
+          example: "Відмінна оптимізація шейдерів у Godot"
+
+    EvaluationResponse:
+      allOf:
+        - $ref: '#/components/schemas/EvaluationCreate'
+        - type: object
+          required:
+            - id
+            - submission_id
+            - judge_id
+            - created_at
+          properties:
+            id:
+              type: string
+              example: "eval-101"
+            submission_id:
+              type: string
+              example: "sub-frostbite-42"
+            judge_id:
+              type: string
+              example: "judge-07"
+            created_at:
+              type: string
+              format: date-time
+              example: "2026-10-03T14:30:00Z"
 
     LeaderboardItem:
       type: object
+      required:
+        - rank
+        - submission_id
+        - title
+        - team_name
+        - engine
+        - raw_score
+        - penalty_points
+        - final_score
       properties:
         rank:
           type: integer
+          example: 1
         submission_id:
           type: string
+          example: "sub-frostbite-42"
         title:
           type: string
+          example: "Frostbite Odyssey"
         team_name:
           type: string
+          example: "PixelCrafters"
+        engine:
+          type: string
+          example: "Godot 4.3"
         raw_score:
           type: number
+          example: 4.60
         penalty_points:
           type: number
+          example: 0.00
         final_score:
           type: number
+          example: 4.60
 
     EngineStat:
       type: object
+      required:
+        - engine
+        - count
+        - percentage
       properties:
         engine:
           type: string
+          example: "Godot"
         count:
           type: integer
+          example: 48
         percentage:
           type: number
+          example: 45.71
+
+    CatalogProjectItem:
+      type: object
+      required:
+        - id
+        - jam_id
+        - jam_title
+        - title
+        - team_name
+        - engine
+        - build_url
+        - rank
+        - final_score
+      properties:
+        id:
+          type: string
+          example: "sub-frostbite-42"
+        jam_id:
+          type: string
+          example: "jam-winter-2026"
+        jam_title:
+          type: string
+          example: "Winter Indie Jam 2026"
+        title:
+          type: string
+          example: "Frostbite Odyssey"
+        team_name:
+          type: string
+          example: "PixelCrafters"
+        engine:
+          type: string
+          example: "Godot 4.3"
+        build_url:
+          type: string
+          format: uri
+          example: "https://pixelcrafters.itch.io/frostbite-odyssey"
+        rank:
+          type: integer
+          example: 1
+        final_score:
+          type: number
+          example: 4.60

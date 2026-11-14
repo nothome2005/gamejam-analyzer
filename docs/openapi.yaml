@@ -798,6 +798,36 @@ paths:
         '404':
           $ref: '#/components/responses/404NotFound'
 
+  /analytics/genres:
+    get:
+      summary: Отримати статистику розподілу ігрових жанрів (Addendum 02)
+      description: Агрегація популярності ігрових жанрів по всіх зареєстрованих проєктах системи.
+      operationId: getGlobalGenreAnalytics
+      x-req-id: "REQ-F-011"
+      security: []
+      responses:
+        '200':
+          description: Звіт популярності ігрових жанрів
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GenreStat'
+              example:
+                - genre: "Platformer"
+                  count: 24
+                  percentage: 40.0
+                - genre: "Puzzle"
+                  count: 18
+                  percentage: 30.0
+                - genre: "Roguelike"
+                  count: 12
+                  percentage: 20.0
+                - genre: "RPG"
+                  count: 6
+                  percentage: 10.0
+
   /catalog/jams:
     get:
       summary: Отримати публічний каталог завершених джемів
@@ -836,6 +866,13 @@ paths:
       x-req-id: "REQ-F-010"
       security: []
       parameters:
+        - name: genre
+          in: query
+          required: false
+          schema:
+            type: string
+          description: "Фільтрація за ігровим жанром (Addendum 02)"
+          example: "Platformer"
         - name: engine
           in: query
           required: false
@@ -1244,6 +1281,15 @@ components:
           example:
             - "Kenney Audio Pack (CC0)"
             - "Custom 2D Pixel Sprites"
+        genres:
+          type: array
+          description: "Класифікація за жанрами від 1 до 3 (Addendum 02)"
+          items:
+            type: string
+            enum: [Action, Adventure, Puzzle, RPG, Strategy, Platformer, Roguelike, Visual Novel, Horror, Simulation]
+          example:
+            - "Platformer"
+            - "Puzzle"
 
     SubmissionUpdate:
       type: object
@@ -1270,6 +1316,14 @@ components:
           type: array
           items:
             type: string
+        genres:
+          type: array
+          description: "Оновлений перелік жанрів від 1 до 3 (Addendum 02)"
+          items:
+            type: string
+            enum: [Action, Adventure, Puzzle, RPG, Strategy, Platformer, Roguelike, Visual Novel, Horror, Simulation]
+          example:
+            - "Roguelike"
 
     SubmissionResponse:
       allOf:
@@ -1495,3 +1549,26 @@ components:
         final_score:
           type: number
           example: 4.60
+        genres:
+          type: array
+          description: "Жанри проєкту (Addendum 02)"
+          items:
+            type: string
+          example: ["Platformer", "Puzzle"]
+
+    GenreStat:
+      type: object
+      required:
+        - genre
+        - count
+        - percentage
+      properties:
+        genre:
+          type: string
+          example: "Platformer"
+        count:
+          type: integer
+          example: 24
+        percentage:
+          type: number
+          example: 40.0

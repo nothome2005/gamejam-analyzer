@@ -14,6 +14,7 @@ from src.api.errors import ProblemDetailsException
 from src.api.middleware import log_system_event
 from src.api.serializers import serialize_submission
 from src.submissions.models import SubmissionCreate
+from src.submissions.validators import VALID_GENRES
 from src.jams.models import JamStatus
 
 router = APIRouter(tags=["Submissions"])
@@ -31,6 +32,19 @@ class SubmissionCreateDTO(BaseModel):
     engine: str
     build_url: Optional[str] = "https://builds.gamejam.local/download"
     third_party_assets: Optional[List[str]] = Field(default_factory=list)
+    asset_inventory: Optional[List[str]] = None
+    genres: Optional[List[str]] = Field(default_factory=list)
+
+class SubmissionUpdateDTO(BaseModel):
+    title: Optional[str] = None
+    project_name: Optional[str] = None
+    genres: Optional[List[str]] = None
+    build_url: Optional[str] = None
+    git_url: Optional[str] = None
+    commit_hash: Optional[str] = None
+    sha256_checksum: Optional[str] = None
+    build_size_mb: Optional[float] = None
+    third_party_assets: Optional[List[str]] = None
     asset_inventory: Optional[List[str]] = None
 
 class VerifyHashDTO(BaseModel):
@@ -62,6 +76,25 @@ def submit_project(jam_id: str, payload: SubmissionCreateDTO):
             invalid_params=[{"name": "build_size_mb", "reason": "build_size_mb must be <= 500.0"}]
         )
 
+    # Валідація жанрів (REQ-F-011, AC-F-011.1, AC-F-011.2, NEG-GENRE-01, NEG-GENRE-02)
+    genres_list = payload.genres or []
+    if genres_list:
+        if len(genres_list) > 3:
+            raise ProblemDetailsException(
+                status=422,
+                title="Unprocessable Entity",
+                detail="Проєкт може містити не більше 3 жанрів.",
+                invalid_params=[{"name": "genres", "reason": "Кількість жанрів повинна бути від 1 до 3."}]
+            )
+        invalid_g = [g for g in genres_list if g not in VALID_GENRES]
+        if invalid_g:
+            raise ProblemDetailsException(
+                status=422,
+                title="Unprocessable Entity",
+                detail=f"Невідомі ігрові жанри: {invalid_g}. Дозволені: {sorted(list(VALID_GENRES))}.",
+                invalid_params=[{"name": "genres", "reason": f"Невідомі жанри: {invalid_g}"}]
+            )
+
     assets = payload.third_party_assets or payload.asset_inventory or []
 
     domain_create = SubmissionCreate(
@@ -74,7 +107,8 @@ def submit_project(jam_id: str, payload: SubmissionCreateDTO):
         sha256_checksum=payload.sha256_checksum.lower(),
         build_url=payload.build_url or "https://builds.gamejam.local/download",
         build_size_mb=payload.build_size_mb,
-        asset_inventory=assets
+        asset_inventory=assets,
+        genres=genres_list
     )
 
     submission = services.submission_service.submit_project(
@@ -138,6 +172,47 @@ def get_submission(submission_id: str, x_user_role: Optional[str] = Header("Gues
             )
 
     return serialize_submission(sub)
+
+@router.put("/submissions/{submission_id}", summary="Оновлення сабмішну та жанрів (AC-F-011.3)")
+def update_submission(submission_id: str, payload: SubmissionUpdateDTO):
+    sub = services.submission_service.get_submission(submission_id)
+    if not sub:
+        raise ProblemDetailsException(status=404, title="Not Found", detail=f"Сабмішн '{submission_id}' не знайдено.")
+
+    if payload.genres is not None:
+        if len(payload.genres) > 3:
+            raise ProblemDetailsException(
+                status=422,
+                title="Unprocessable Entity",
+                detail="Проєкт може містити не більше 3 жанрів.",
+                invalid_params=[{"name": "genres", "reason": "Максимальна кількість жанрів - 3"}]
+            )
+        invalid_g = [g for g in payload.genres if g not in VALID_GENRES]
+        if invalid_g:
+            raise ProblemDetailsException(
+                status=422,
+                title="Unprocessable Entity",
+                detail=f"Невідомі жанри: {invalid_g}.",
+                invalid_params=[{"name": "genres", "reason": f"Невідомі жанри: {invalid_g}"}]
+            )
+
+    updated_sub = services.submission_service.update_submission(
+        submission_id=submission_id,
+        title=payload.title or payload.project_name,
+        genres=payload.genres,
+        build_url=payload.build_url,
+        git_url=payload.git_url,
+        commit_hash=payload.commit_hash,
+        sha256_checksum=payload.sha256_checksum,
+        build_size_mb=payload.build_size_mb
+    )
+
+    log_system_event("PROJECT_UPDATED", {
+        "submission_id": sub.id,
+        "genres": updated_sub.genres
+    })
+
+    return serialize_submission(updated_sub)
 
 @router.post("/submissions/{submission_id}/verify-hash", summary="Верифікація цілісності білда за SHA-256")
 def verify_submission_hash(submission_id: str, payload: VerifyHashDTO):

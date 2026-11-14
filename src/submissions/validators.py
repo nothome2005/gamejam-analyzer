@@ -7,6 +7,34 @@ class SubmissionValidationError(ValueError):
 SHA256_REGEX = re.compile(r"^[a-fA-F0-9]{64}$")
 GIT_URL_REGEX = re.compile(r"^(https?://|git@)[a-zA-Z0-9.-]+(/[a-zA-Z0-9_.-]+)+(\.git)?/?$")
 
+VALID_GENRES = {
+    "Action",
+    "Adventure",
+    "Puzzle",
+    "RPG",
+    "Strategy",
+    "Platformer",
+    "Roguelike",
+    "Visual Novel",
+    "Horror",
+    "Simulation"
+}
+
+def validate_genres(genres: list) -> list:
+    """
+    Validates genre list against normative taxonomy (AC-F-011.1, AC-F-011.2).
+    """
+    if not genres:
+        return []
+    if len(genres) > 3:
+        raise SubmissionValidationError("Проєкт може містити не більше 3 жанрів.")
+    invalid = [g for g in genres if g not in VALID_GENRES]
+    if invalid:
+        raise SubmissionValidationError(
+            f"Невідомі жанри: {invalid}. Дозволена таксономія: {sorted(list(VALID_GENRES))}."
+        )
+    return genres
+
 def validate_sha256_hash(checksum: str) -> str:
     """
     Validates that checksum is exactly 64 hexadecimal characters (AC-F-003, BDD-SC-003).

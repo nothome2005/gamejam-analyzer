@@ -2,7 +2,12 @@ import uuid
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
 from .models import Submission, SubmissionCreate, SubmissionStatus
-from .validators import validate_sha256_hash, validate_git_url, SubmissionValidationError
+from .validators import (
+    validate_sha256_hash,
+    validate_git_url,
+    validate_genres,
+    SubmissionValidationError
+)
 from .deadline_service import DeadlineService
 
 class SubmissionService:
@@ -40,6 +45,9 @@ class SubmissionService:
             penalty_per_hour_percent=penalty_per_hour_percent
         )
 
+        # 5. Validate Genres taxonomy (REQ-F-011, AC-F-011.1, AC-F-011.2)
+        valid_genres = validate_genres(payload.genres)
+
         sub_id = f"sub-{uuid.uuid4().hex[:8]}"
         submission = Submission(
             id=sub_id,
@@ -53,6 +61,7 @@ class SubmissionService:
             build_url=payload.build_url,
             build_size_mb=payload.build_size_mb,
             asset_inventory=payload.asset_inventory,
+            genres=valid_genres,
             status=SubmissionStatus.SUBMITTED,
             submitted_at=submitted_at,
             is_late=deadline_result.is_late,
@@ -61,6 +70,40 @@ class SubmissionService:
         )
         self._submissions[sub_id] = submission
         return submission
+
+    def update_submission(
+        self,
+        submission_id: str,
+        title: Optional[str] = None,
+        genres: Optional[List[str]] = None,
+        build_url: Optional[str] = None,
+        git_url: Optional[str] = None,
+        commit_hash: Optional[str] = None,
+        sha256_checksum: Optional[str] = None,
+        build_size_mb: Optional[float] = None
+    ) -> Submission:
+        sub = self._submissions.get(submission_id)
+        if not sub:
+            raise SubmissionValidationError(f"Сабмішн '{submission_id}' не знайдено.")
+
+        if title is not None:
+            sub.title = title
+        if genres is not None:
+            sub.genres = validate_genres(genres)
+        if build_url is not None:
+            sub.build_url = build_url
+        if git_url is not None:
+            sub.git_url = validate_git_url(git_url)
+        if commit_hash is not None:
+            sub.commit_hash = commit_hash
+        if sha256_checksum is not None:
+            sub.sha256_checksum = validate_sha256_hash(sha256_checksum)
+        if build_size_mb is not None:
+            if build_size_mb > 500.0:
+                raise SubmissionValidationError(f"Розмір білда ({build_size_mb} МБ) перевищує 500 МБ.")
+            sub.build_size_mb = build_size_mb
+
+        return sub
 
     def get_submission(self, submission_id: str) -> Optional[Submission]:
         return self._submissions.get(submission_id)

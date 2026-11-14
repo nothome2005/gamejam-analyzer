@@ -7,8 +7,22 @@ from fastapi import APIRouter
 from src.api.state import services
 from src.api.errors import ProblemDetailsException
 from src.analytics.engines import aggregate_engine_stats
+from src.analytics.genres import aggregate_genre_stats
 
 router = APIRouter(tags=["Analytics"])
+
+@router.get("/analytics/genres", summary="Глобальна статистика використання ігрових жанрів (REQ-F-011)")
+def get_global_genre_analytics():
+    all_subs = list(services.submission_service._submissions.values())
+    stats = aggregate_genre_stats(all_subs)
+    return [
+        {
+            "genre": s.genre,
+            "count": s.count,
+            "percentage": s.percentage
+        }
+        for s in stats
+    ]
 
 @router.get("/analytics/engines", summary="Глобальна статистика використання ігрових рушіїв (REQ-F-009)")
 def get_global_engine_analytics():

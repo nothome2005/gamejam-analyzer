@@ -56,6 +56,7 @@ def serialize_submission(sub: Submission) -> dict:
         "build_url": sub.build_url,
         "build_size_mb": sub.build_size_mb,
         "engine": sub.engine,
+        "genres": getattr(sub, "genres", []) or [],
         "third_party_assets": getattr(sub, "asset_inventory", []),
         "asset_inventory": getattr(sub, "asset_inventory", []),
         "status": sub.status.value if hasattr(sub.status, "value") else str(sub.status),

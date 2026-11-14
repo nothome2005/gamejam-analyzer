@@ -21,6 +21,7 @@ class SubmissionCreate:
     build_url: str
     build_size_mb: float
     asset_inventory: List[str] = field(default_factory=list)
+    genres: List[str] = field(default_factory=list)
 
 @dataclass
 class Submission:
@@ -35,6 +36,7 @@ class Submission:
     build_url: str
     build_size_mb: float
     asset_inventory: List[str]
+    genres: List[str] = field(default_factory=list)
     status: SubmissionStatus = SubmissionStatus.SUBMITTED
     submitted_at: Optional[datetime] = None
     is_late: bool = False

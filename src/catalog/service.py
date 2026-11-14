@@ -8,15 +8,22 @@ class CatalogService:
     def get_public_catalog(
         self,
         engine: Optional[str] = None,
+        genre: Optional[str] = None,
         page: int = 1,
         page_size: int = 10
     ) -> dict:
         """
-        Public catalog with pagination and engine filtering (AC-F-010).
+        Public catalog with pagination, engine and genre filtering (AC-F-010, AC-F-011.4).
         """
         items = self._submissions
         if engine:
             items = [s for s in items if s.engine.lower() == engine.lower()]
+        if genre:
+            genre_lower = genre.lower()
+            items = [
+                s for s in items
+                if any(g.lower() == genre_lower for g in getattr(s, "genres", []))
+            ]
 
         start_idx = (page - 1) * page_size
         end_idx = start_idx + page_size

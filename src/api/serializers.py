@@ -66,6 +66,21 @@ def serialize_submission(sub: Submission) -> dict:
         "penalty_points": sub.penalty_points
     }
 
+def serialize_catalog_project(sub: Submission) -> dict:
+    """Серіалізація проєкту для публічного каталогу (OpenAPI CatalogProjectItem)."""
+    return {
+        "id": sub.id,
+        "jam_id": sub.jam_id,
+        "team_id": sub.team_id,
+        "project_name": getattr(sub, "title", "Project"),
+        "title": getattr(sub, "title", "Project"),
+        "engine": sub.engine,
+        "genres": getattr(sub, "genres", []) or [],
+        "build_url": sub.build_url,
+        "build_size_mb": sub.build_size_mb,
+        "submitted_at": sub.submitted_at.isoformat() if sub.submitted_at else None
+    }
+
 def serialize_evaluation(ev: Evaluation) -> dict:
     """Серіалізація оцінки журі у EvaluationResponse."""
     return {

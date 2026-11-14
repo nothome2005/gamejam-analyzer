@@ -21,6 +21,27 @@ router = APIRouter(tags=["Submissions"])
 
 SHA256_PATTERN = re.compile(r"^[a-fA-F0-9]{64}$")
 
+def _assert_valid_genres(genres: Optional[List[str]]) -> List[str]:
+    """Централізована валідація переліку жанрів за нормативною таксономією (DRY)."""
+    if not genres:
+        return []
+    if len(genres) > 3:
+        raise ProblemDetailsException(
+            status=422,
+            title="Unprocessable Entity",
+            detail="Проєкт може містити не більше 3 жанрів.",
+            invalid_params=[{"name": "genres", "reason": "Кількість жанрів повинна бути від 1 до 3."}]
+        )
+    invalid_g = [g for g in genres if g not in VALID_GENRES]
+    if invalid_g:
+        raise ProblemDetailsException(
+            status=422,
+            title="Unprocessable Entity",
+            detail=f"Невідомі ігрові жанри: {invalid_g}. Дозволені: {sorted(list(VALID_GENRES))}.",
+            invalid_params=[{"name": "genres", "reason": f"Невідомі жанри: {invalid_g}"}]
+        )
+    return genres
+
 class SubmissionCreateDTO(BaseModel):
     team_id: str
     project_name: Optional[str] = None
@@ -77,23 +98,7 @@ def submit_project(jam_id: str, payload: SubmissionCreateDTO):
         )
 
     # Валідація жанрів (REQ-F-011, AC-F-011.1, AC-F-011.2, NEG-GENRE-01, NEG-GENRE-02)
-    genres_list = payload.genres or []
-    if genres_list:
-        if len(genres_list) > 3:
-            raise ProblemDetailsException(
-                status=422,
-                title="Unprocessable Entity",
-                detail="Проєкт може містити не більше 3 жанрів.",
-                invalid_params=[{"name": "genres", "reason": "Кількість жанрів повинна бути від 1 до 3."}]
-            )
-        invalid_g = [g for g in genres_list if g not in VALID_GENRES]
-        if invalid_g:
-            raise ProblemDetailsException(
-                status=422,
-                title="Unprocessable Entity",
-                detail=f"Невідомі ігрові жанри: {invalid_g}. Дозволені: {sorted(list(VALID_GENRES))}.",
-                invalid_params=[{"name": "genres", "reason": f"Невідомі жанри: {invalid_g}"}]
-            )
+    genres_list = _assert_valid_genres(payload.genres)
 
     assets = payload.third_party_assets or payload.asset_inventory or []
 
@@ -179,27 +184,12 @@ def update_submission(submission_id: str, payload: SubmissionUpdateDTO):
     if not sub:
         raise ProblemDetailsException(status=404, title="Not Found", detail=f"Сабмішн '{submission_id}' не знайдено.")
 
-    if payload.genres is not None:
-        if len(payload.genres) > 3:
-            raise ProblemDetailsException(
-                status=422,
-                title="Unprocessable Entity",
-                detail="Проєкт може містити не більше 3 жанрів.",
-                invalid_params=[{"name": "genres", "reason": "Максимальна кількість жанрів - 3"}]
-            )
-        invalid_g = [g for g in payload.genres if g not in VALID_GENRES]
-        if invalid_g:
-            raise ProblemDetailsException(
-                status=422,
-                title="Unprocessable Entity",
-                detail=f"Невідомі жанри: {invalid_g}.",
-                invalid_params=[{"name": "genres", "reason": f"Невідомі жанри: {invalid_g}"}]
-            )
+    valid_genres = _assert_valid_genres(payload.genres) if payload.genres is not None else None
 
     updated_sub = services.submission_service.update_submission(
         submission_id=submission_id,
         title=payload.title or payload.project_name,
-        genres=payload.genres,
+        genres=valid_genres,
         build_url=payload.build_url,
         git_url=payload.git_url,
         commit_hash=payload.commit_hash,

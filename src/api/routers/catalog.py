@@ -6,6 +6,7 @@ Catalog Router (REQ-F-010, POS-09).
 from typing import Optional
 from fastapi import APIRouter, Query
 from src.api.state import services
+from src.api.serializers import serialize_catalog_project
 
 router = APIRouter(prefix="/catalog", tags=["Catalog"])
 
@@ -36,18 +37,4 @@ def get_catalog_projects(
         page_size=page_size
     )
     items = catalog_res.get("items", [])
-    result = []
-    for sub in items:
-        result.append({
-            "id": sub.id,
-            "jam_id": sub.jam_id,
-            "team_id": sub.team_id,
-            "project_name": getattr(sub, "title", "Project"),
-            "title": getattr(sub, "title", "Project"),
-            "engine": sub.engine,
-            "genres": getattr(sub, "genres", []) or [],
-            "build_url": sub.build_url,
-            "build_size_mb": sub.build_size_mb,
-            "submitted_at": sub.submitted_at.isoformat() if sub.submitted_at else None
-        })
-    return result
+    return [serialize_catalog_project(sub) for sub in items]

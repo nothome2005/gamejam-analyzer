@@ -1,26 +1,16 @@
+# -*- coding: utf-8 -*-
 """
-Game Jam Analyzer - Application Entrypoint (Stub)
+Game Jam Analyzer - REST API Application Server Entrypoint
 """
-from src.jams.service import JamService
-from src.submissions.service import SubmissionService
-from src.evaluations.service import EvaluationService
-from src.analytics.leaderboard import calculate_leaderboard
-from src.analytics.engines import aggregate_engine_stats
 
-class GameJamAnalyzerApp:
-    def __init__(self):
-        self.jam_service = JamService()
-        self.submission_service = SubmissionService()
-        self.evaluation_service = EvaluationService()
+import sys
+import uvicorn
+from src.api.app import app
 
-    def get_status(self) -> dict:
-        return {
-            "name": "Game Jam Analyzer",
-            "version": "1.0.0",
-            "status": "ready"
-        }
-
-app = GameJamAnalyzerApp()
+def run_server(host: str = "127.0.0.1", port: int = 4010):
+    print(f"🚀 Запуск REST API сервера Game Jam Analyzer на http://{host}:{port}...")
+    uvicorn.run("src.api.app:app", host=host, port=port, reload=False, log_level="info")
 
 if __name__ == "__main__":
-    print(app.get_status())
+    port = int(sys.argv[1]) if len(sys.argv) > 1 else 4010
+    run_server(port=port)

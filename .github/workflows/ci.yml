@@ -21,10 +21,10 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install Test Dependencies
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest
+          pip install -r requirements.txt
 
       - name: Validate SDD Directory Structure
         run: |
@@ -93,6 +93,12 @@ jobs:
           print("OK: All GitHub Issue templates validated successfully.")
           EOF
 
-      - name: Run Pytest Suite (Unit and BDD Acceptance Tests)
+      - name: Validate OpenAPI 3.0.3 Contract
+        run: |
+          python -c "import yaml; from openapi_spec_validator import validate_spec; spec = yaml.safe_load(open('docs/openapi.yaml', encoding='utf-8')); validate_spec(spec); print('OK: OpenAPI 3.0.3 contract is valid.')"
+
+      - name: Run Pytest Suite (Unit, BDD and Integration Contract Tests)
+        env:
+          PYTHONPATH: .
         run: |
           pytest tests -v

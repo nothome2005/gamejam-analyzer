@@ -5,12 +5,13 @@ Jams Management Router (REQ-F-001, AC-F-001, BDD-SC-001).
 
 from typing import List, Optional
 from datetime import datetime
-from fastapi import APIRouter, Query, Response, status
+from fastapi import APIRouter, Query, status
 from pydantic import BaseModel, Field
 
 from src.api.state import services
 from src.api.errors import ProblemDetailsException
 from src.api.middleware import log_system_event
+from src.api.serializers import serialize_jam
 from src.jams.models import JamCreate, JamStatus
 
 router = APIRouter(prefix="/jams", tags=["Jams"])
@@ -26,21 +27,8 @@ class JamCreateDTO(BaseModel):
 class JamStatusUpdateDTO(BaseModel):
     status: str
 
-def _jam_to_dict(jam) -> dict:
-    return {
-        "id": jam.id,
-        "title": jam.title,
-        "theme": jam.theme,
-        "start_time": jam.start_time.isoformat() if hasattr(jam.start_time, "isoformat") else str(jam.start_time),
-        "submission_deadline": jam.submission_deadline.isoformat() if hasattr(jam.submission_deadline, "isoformat") else str(jam.submission_deadline),
-        "review_deadline": jam.review_deadline.isoformat() if hasattr(jam.review_deadline, "isoformat") else str(jam.review_deadline),
-        "status": jam.status.value if hasattr(jam.status, "value") else str(jam.status),
-        "penalty_per_hour_percent": jam.penalty_per_hour_percent
-    }
-
 @router.post("", status_code=status.HTTP_201_CREATED, summary="Створення джему (REQ-F-001)")
 def create_jam(payload: JamCreateDTO):
-    # Валідація хронології дедлайнів
     if payload.start_time >= payload.submission_deadline:
         raise ProblemDetailsException(
             status=422,
@@ -65,9 +53,8 @@ def create_jam(payload: JamCreateDTO):
         penalty_per_hour_percent=payload.penalty_per_hour_percent
     )
     jam = services.jam_service.create_jam(domain_payload)
-    
     log_system_event("JAM_CREATED", {"jam_id": jam.id, "title": jam.title})
-    return _jam_to_dict(jam)
+    return serialize_jam(jam)
 
 @router.get("", summary="Отримання списку джемів із фільтром")
 def list_jams(status: Optional[str] = Query(None)):
@@ -76,7 +63,7 @@ def list_jams(status: Optional[str] = Query(None)):
         filtered = [j for j in all_jams if (j.status.value if hasattr(j.status, "value") else str(j.status)).lower() == status.lower()]
     else:
         filtered = all_jams
-    return [_jam_to_dict(j) for j in filtered]
+    return [serialize_jam(j) for j in filtered]
 
 @router.get("/{jam_id}", summary="Отримання картки джему")
 def get_jam(jam_id: str):
@@ -87,7 +74,7 @@ def get_jam(jam_id: str):
             title="Not Found",
             detail=f"Джем із вказаним ідентифікатором '{jam_id}' не знайдено."
         )
-    return _jam_to_dict(jam)
+    return serialize_jam(jam)
 
 @router.patch("/{jam_id}/status", summary="Переведення фази джему (State Machine)")
 def update_jam_status(jam_id: str, payload: JamStatusUpdateDTO):
@@ -100,7 +87,6 @@ def update_jam_status(jam_id: str, payload: JamStatusUpdateDTO):
         )
 
     new_status = payload.status
-    # Оновлення статусу джему
     valid_statuses = ["Draft", "Created", "Active", "SubmissionClosed", "UnderReview", "Under Review", "Completed", "Complete"]
     if new_status not in valid_statuses:
         raise ProblemDetailsException(
@@ -109,7 +95,6 @@ def update_jam_status(jam_id: str, payload: JamStatusUpdateDTO):
             detail=f"Недопустимий статус джему: '{new_status}'."
         )
 
-    # Присвоюємо нормалізований статус
     if new_status in ("UnderReview", "Under Review"):
         jam.status = JamStatus.UNDER_REVIEW
     elif new_status in ("Completed", "Complete"):
@@ -120,4 +105,4 @@ def update_jam_status(jam_id: str, payload: JamStatusUpdateDTO):
         jam.status = JamStatus.CREATED
 
     log_system_event("JAM_STATUS_CHANGED", {"jam_id": jam.id, "new_status": str(jam.status)})
-    return _jam_to_dict(jam)
+    return serialize_jam(jam)

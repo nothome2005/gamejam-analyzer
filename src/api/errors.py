@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Централізована обробка винятків за стандартом RFC 7807 (Problem Details for HTTP APIs).
-Формує структуровані JSON-відповіді з медіа-типом application/problem+json.
+Формує структуровані JSON-відповіді з медіа-типом application/problem+json та логує інциденти.
 """
 
 from fastapi import Request
@@ -12,6 +12,7 @@ from src.teams.service import TeamValidationError
 from src.submissions.validators import SubmissionValidationError
 from src.evaluations.service import EvaluationError
 from src.auth.rbac import AccessDeniedError
+from src.api.middleware import log_system_event
 
 class ProblemDetailsException(Exception):
     def __init__(
@@ -49,6 +50,15 @@ def create_problem_response(
     if invalid_params:
         payload["invalid_params"] = invalid_params
 
+    # Фіксація інциденту в системному журналі аудиту
+    log_system_event("API_PROBLEM_DETAILS_RETURNED", {
+        "status": status,
+        "title": title,
+        "detail": detail,
+        "instance": instance,
+        "invalid_params_count": len(invalid_params) if invalid_params else 0
+    })
+
     return JSONResponse(
         status_code=status,
         content=payload,
@@ -83,7 +93,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     )
 
 async def domain_validation_handler(request: Request, exc: ValueError):
-    # Відображення доменних помилок валідації у 422 Problem Details
     return create_problem_response(
         status=422,
         title="Unprocessable Entity",
@@ -93,7 +102,6 @@ async def domain_validation_handler(request: Request, exc: ValueError):
     )
 
 async def team_conflict_handler(request: Request, exc: TeamValidationError):
-    # Користувач уже зареєстрований у іншій команді цього джему -> 409 Conflict
     return create_problem_response(
         status=409,
         title="Conflict",
@@ -102,7 +110,6 @@ async def team_conflict_handler(request: Request, exc: TeamValidationError):
     )
 
 async def access_denied_handler(request: Request, exc: AccessDeniedError):
-    # Заборона неавторизованого доступу до оцінок під час Under Review -> 403 Forbidden
     return create_problem_response(
         status=403,
         title="Forbidden",

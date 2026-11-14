@@ -3,14 +3,15 @@
 Teams Management Router (REQ-F-002, AC-F-002, POS-03, NEG-06).
 """
 
-from typing import List, Optional
+from typing import Optional
 from fastapi import APIRouter, Response, status
 from pydantic import BaseModel, Field
 
 from src.api.state import services
 from src.api.errors import ProblemDetailsException
 from src.api.middleware import log_system_event
-from src.teams.models import Participant, Team
+from src.api.serializers import serialize_team
+from src.teams.models import Participant
 
 router = APIRouter(tags=["Teams"])
 
@@ -31,25 +32,6 @@ class AddMemberDTO(BaseModel):
     invite_code: Optional[str] = None
     member: ParticipantDTO
 
-def _team_to_dict(team: Team) -> dict:
-    invite_code = _TEAM_INVITES.get(team.id, f"INV-{team.id.replace('team-', '')[:6].upper()}")
-    members_data = []
-    for m in team.members:
-        members_data.append({
-            "user_id": m.user_id,
-            "name": getattr(m, "username", None) or getattr(m, "name", m.user_id),
-            "username": getattr(m, "username", None) or getattr(m, "name", m.user_id),
-            "specialization": m.specialization
-        })
-    return {
-        "id": team.id,
-        "name": team.name,
-        "jam_id": team.jam_id,
-        "captain_id": team.captain_id,
-        "invite_code": invite_code,
-        "members": members_data
-    }
-
 @router.post("/jams/{jam_id}/teams", status_code=status.HTTP_201_CREATED, summary="Реєстрація команди (REQ-F-002)")
 def create_team(jam_id: str, payload: TeamCreateDTO):
     jam = services.jam_service.get_jam(jam_id)
@@ -62,7 +44,6 @@ def create_team(jam_id: str, payload: TeamCreateDTO):
         username=captain_name,
         specialization=payload.captain.specialization
     )
-    # Зберігаємо також атрибут name для сумісності
     captain.name = captain_name
 
     membership_key = (jam_id, captain.user_id)
@@ -78,19 +59,19 @@ def create_team(jam_id: str, payload: TeamCreateDTO):
     _TEAM_INVITES[team.id] = invite_code
 
     log_system_event("TEAM_REGISTERED", {"team_id": team.id, "jam_id": jam_id, "captain_id": captain.user_id})
-    return _team_to_dict(team)
+    return serialize_team(team, invite_code)
 
 @router.get("/jams/{jam_id}/teams", summary="Список команд джему")
 def get_jam_teams(jam_id: str):
     teams = [t for t in services.team_service._teams.values() if t.jam_id == jam_id]
-    return [_team_to_dict(t) for t in teams]
+    return [serialize_team(t, _TEAM_INVITES.get(t.id)) for t in teams]
 
 @router.get("/teams/{team_id}", summary="Отримання даних команди")
 def get_team(team_id: str):
     team = services.team_service._teams.get(team_id)
     if not team:
         raise ProblemDetailsException(status=404, title="Not Found", detail=f"Команду '{team_id}' не знайдено.")
-    return _team_to_dict(team)
+    return serialize_team(team, _TEAM_INVITES.get(team.id))
 
 @router.post("/teams/{team_id}/members", summary="Приєднання учасника до команди за інвайт-кодом")
 def join_team(team_id: str, payload: AddMemberDTO):
@@ -120,7 +101,7 @@ def join_team(team_id: str, payload: AddMemberDTO):
 
     services.team_service.add_member(team_id, participant)
     log_system_event("TEAM_MEMBER_JOINED", {"team_id": team.id, "user_id": participant.user_id})
-    return _team_to_dict(team)
+    return serialize_team(team, expected_invite)
 
 @router.delete("/teams/{team_id}/members/{user_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Виключення учасника з команди")
 def remove_team_member(team_id: str, user_id: str):

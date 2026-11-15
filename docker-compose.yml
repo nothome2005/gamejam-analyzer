@@ -1,0 +1,25 @@
+services:
+  # Основний REST API веб-сервер
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gamejam-api
+    ports:
+      - "8000:8000"
+    volumes:
+      # Прокидаємо папку логів на хост для збереження історії аудиту
+      - ./logs:/app/logs
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  # Сервіс для запуску автоматизованих тестів у контейнері
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gamejam-tests
+    volumes:
+      - ./logs:/app/logs
+    command: ["pytest", "-v"]

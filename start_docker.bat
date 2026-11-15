@@ -1,13 +1,19 @@
 @echo off
-chcp 65001 > nul
-echo Запуск Game Jam Analyzer у Docker контейнері...
+echo Starting Game Jam Analyzer in Docker...
 docker compose up -d
+if %errorlevel% neq 0 (
+    echo.
+    echo [ERROR] Failed to start Docker. Please ensure Docker Desktop is running.
+    echo.
+    pause
+    exit /b %errorlevel%
+)
 echo.
-echo Сервер запущено!
-echo Відкриття Swagger UI у браузері...
+echo [OK] Server is running!
+echo Opening Swagger UI at http://localhost:8000/docs ...
 start http://localhost:8000/docs
 echo.
-echo Щоб переглядати логи в реальному часі, виконайте:
+echo To inspect live logs, run:
 echo   docker compose logs -f api
 echo.
 pause
